@@ -8,7 +8,7 @@
 
 ## 1. 개요
 
-네트워크 시스템은 Photon Fusion 2 Shared Mode를 기반으로 VIRDY의 실시간 멀티유저 협업을 지원한다. 최대 100명이 동시 접속하여 아바타, 카메라, 채팅을 실시간으로 동기화하며, 데이터 압축과 보간 기술로 네트워크 대역폭을 최적화한다.
+네트워크 시스템은 Photon Fusion Shared Mode를 기반으로 VIRDY의 실시간 멀티유저 협업을 지원한다. 최대 100명이 동시 접속하여 아바타, 카메라, 채팅을 실시간으로 동기화하며, 데이터 압축과 보간 기술로 네트워크 대역폭을 최적화한다.
 
 ---
 
@@ -30,7 +30,7 @@
 
 | 항목 | 값 |
 |------|-----|
-| 게임 모드 | Photon Fusion 2 Shared Mode |
+| 게임 모드 | Photon Fusion Shared Mode |
 | 최대 플레이어 | 100명 |
 | 로비 유형 | Custom |
 | 로비 이름 | VIRDY.{버전} |
@@ -280,7 +280,7 @@ Photon Chat을 활용한 텍스트 채팅 및 소셜 기능:
 
 ### 3.1 Shared Mode 특성
 
-Photon Fusion 2 Shared Mode를 사용하므로:
+Photon Fusion Shared Mode를 사용하므로:
 
 - 각 플레이어가 자신의 오브젝트에 대한 StateAuthority를 가짐
 - 서버가 아닌 클라이언트가 자신의 데이터를 직접 업데이트

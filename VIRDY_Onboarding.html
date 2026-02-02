@@ -255,10 +255,15 @@
             <div class="sidebar-header">
                 <h1>🎬 VIRDY</h1>
                 <p>기획 문서 통합본</p>
-                <p style="margin-top: 10px; font-size: 11px;">생성일: 2026-02-02 16:29</p>
+                <p style="margin-top: 10px; font-size: 11px;">생성일: 2026-02-02 21:11</p>
             </div>
             <nav>
-                <div class="nav-category">📦 제품 정의</div>
+                <div class="nav-category">📝 최신 업데이트</div>
+<ul>
+<li><a href="#updates" onclick="showSection('updates')">최근 4주 업데이트</a></li>
+<li><a href="#changelog" onclick="showSection('changelog')">전체 변경 이력</a></li>
+</ul>
+<div class="nav-category">📦 제품 정의</div>
 <ul>
 <li><a href="#01_Product_01_Product_Overview" onclick="showSection('01_Product_01_Product_Overview')">제품 개요</a></li>
 <li><a href="#01_Product_02_User_Flow" onclick="showSection('01_Product_02_User_Flow')">사용자 플로우</a></li>
@@ -295,7 +300,73 @@
         </aside>
 
         <main class="main-content">
-            <section id="01_Product_01_Product_Overview" class="doc-section">
+            <section id="updates" class="doc-section">
+<div class="doc-header"><span class="doc-category">📝 최신 업데이트</span></div>
+<h1>📋 최신 업데이트</h1><p>> 최근 4주간의 주요 변경사항을 확인할 수 있습니다.</p><p>전체 변경 이력은 CHANGELOG.md를 참고하세요.</p><hr></p><h2>2026년 2월 1주차 (01.30 - 02.02)</h2><h3>🔄 용어 통일</h3>
+<strong>영향받는 문서</strong>: 사용자 플로우, 네트워크 시스템, 데이터 생명주기</p><ul><li>"세션" → "월드" 변경</li>
+<li>"세션 소유자" → "호스트 👑" 변경</li></p><p><strong>변경 이유</strong>: 기술 용어가 일반 사용자에게 낯설다는 피드백 반영</p><p><strong>확인할 문서</strong>:
+<li>사용자 플로우 > 2.3.3 호스트와 월드 관리</li>
+<li>네트워크 시스템 > 2.5</li>
+<li>데이터 생명주기 > 3.2</li></p><h3>🆕 호스트 유예 정책 추가</h3>
+<strong>영향받는 문서</strong>: 데이터 생명주기</p><p><li>호스트 퇴장 시 10분 유예 시간 적용</li>
+<li>유예 내 복귀 시 호스트 권한 유지</li>
+<li>유예 후 유료 사용자에게 자동 이전</li></p><p><strong>변경 이유</strong>: 일시적 연결 끊김으로 인한 호스트 권한 상실 방지</p><p><strong>확인할 문서</strong>:
+<li>데이터 생명주기 > 3.2 호스트 이전 정책</li></p><h3>⚠️ 기술 스택 정정</h3>
+<strong>영향받는 문서</strong>: 네트워크 시스템, 기술 아키텍처, README</p><p><li>"Photon Fusion 2" → "Photon Fusion" 수정</li></p><p><strong>확인할 문서</strong>:
+<li>네트워크 시스템 > 2.1</li>
+<li>기술 아키텍처 > 2.1</li></p><h3>📝 문서 시스템 개선</h3>
+<li>CHANGELOG.md 추가: 전체 변경 이력 추적</li>
+<li>UPDATES.md 추가: 최근 4주 업데이트 요약</li>
+<li>`_updates/` 폴더: 주간 상세 리포트</li>
+<li>HTML 온보딩 문서 자동 생성 시스템</li></p><hr></p><h2>2026년 1월 4주차 (01.23 - 01.29)</h2><h3>📄 초기 문서 작성 완료</h3>
+<li>17개 기획 문서 초안 완성</li>
+<li>5개 카테고리별 구조화</li>
+<li>표준 문서 형식 확립</li></p><hr></p><h2>다음 주 예정 사항</h2><p><li>[ ] SDK 배포 계획 구체화</li>
+<li>[ ] 음성 채팅 기능 명세 작성</li>
+<li>[ ] 로컬 모드 설계 검토</li>
+<li>[ ] GitHub Pages 자동 배포 설정</li>
+</ul>
+<hr></p><h2>업데이트 확인 방법</h2><h3>📌 빠른 확인</h3>
+이 파일에서 최근 4주간의 주요 변경사항을 확인하세요.</p><h3>📚 상세 확인</h3>
+`_updates/YYYY-MM-weekX.md` 파일에서 주간 회의 내용과 상세 변경 이유를 확인하세요.</p><h3>📖 전체 이력</h3>
+CHANGELOG.md에서 프로젝트 전체 변경 이력을 확인하세요.</p><h3>🌐 HTML 뷰어</h3>
+`VIRDY_Onboarding.html`을 열면 사이드바에서 최신 업데이트를 확인할 수 있습니다.</p><hr></p><p><strong>마지막 업데이트</strong>: 2026.02.02
+</p>
+</section>
+<section id="changelog" class="doc-section">
+<div class="doc-header"><span class="doc-category">📋 전체 변경 이력</span></div>
+<h1>변경 이력</h1><p>모든 주요 변경사항이 이 파일에 기록됩니다.</p><p>형식은 Keep a Changelog를 따르며,
+이 프로젝트는 Semantic Versioning을 준수합니다.</p><hr></p><h2>[미배포] - 2026-02-02</h2><h3>추가됨</h3>
+<ul><li>CHANGELOG.md: 전체 변경 이력 추적 시스템 도입</li>
+<li>UPDATES.md: 최근 4주 업데이트 요약</li>
+<li>`_updates/` 폴더: 주간 상세 리포트 저장</li>
+<li>HTML 온보딩 문서 생성기 (`generate_onboarding.py`)</li>
+<li>통합 HTML 문서 뷰어 (`VIRDY_Onboarding.html`)</li></p><h3>수정됨</h3>
+<li><strong>네트워크 시스템</strong> (05_Network_System.md)</li>
+  - "Photon Fusion 2" → "Photon Fusion"으로 표기 수정
+  - 섹션: 2.1 기술 스택</p><p><li><strong>기술 아키텍처</strong> (01_Architecture.md)</li>
+  - "Photon Fusion 2" → "Photon Fusion"으로 표기 수정
+  - 섹션: 2.1 기술 스택</p><p><li><strong>사용자 플로우</strong> (02_User_Flow.md)</li>
+  - "세션" → "월드" 용어 통일
+  - "세션 소유자" → "호스트 👑" 용어 통일
+  - 섹션: 2.3.3 호스트와 월드 관리</p><p><li><strong>데이터 생명주기</strong> (04_Data_Lifecycle.md)</li>
+  - 호스트 10분 유예 정책 추가
+  - 섹션: 3.2 호스트 이전 정책</p><hr></p><h2>[1.0.0] - 2026-01-30</h2><h3>추가됨</h3>
+<li>초기 기획 문서 17개 작성 완료</li>
+  - 01_Product: 제품 개요, 사용자 플로우
+  - 02_Features: 아바타, 트래커, 카메라, 월드, 네트워크, SDK
+  - 03_Operations: 사용자 역할, 라이선스, 보안, 데이터 생명주기, 리스크 관리, 계정
+  - 04_Design: UI 기획
+  - 05_Technical: 아키텍처, 개발 현황</p><h3>문서 형식</h3>
+<li>모든 문서는 표준 구조를 따름 (개요, 핵심 기획, 설계 고려사항, 엣지 케이스, 향후 확장)</li>
+<li>문서 버전, 최종 수정일, 작성자 메타데이터 포함</li></p><hr></p><h2>범례</h2><p><li>`추가됨`: 새로운 기능, 문서, 섹션</li>
+<li>`수정됨`: 기존 기능/문서의 변경</li>
+<li>`제거됨`: 삭제된 기능/문서</li>
+<li>`수정 예정`: 향후 변경 예정 사항</li>
+<li>`보안`: 보안 관련 변경사항</li>
+</ul>
+</section>
+<section id="01_Product_01_Product_Overview" class="doc-section">
 <div class="doc-header"><span class="doc-category">제품 정의</span></div>
 <h1>제품 개요</h1><hr></p><h2>1. 개요</h2><p><strong>VIRDY</strong>는 버추얼 크리에이터를 위한 올인원 모션캡처 라이브 스트리밍 솔루션이다. 하나의 프로그램 안에서 아바타 설정, 다종 모션캡처 장비 연동, 가상 카메라 운영, 커스텀 월드 업로드, 실시간 멀티유저 협업까지 모두 수행할 수 있다.</p><p>개인 VTuber부터 프로덕션 스튜디오까지, Motioncapture 기반 라이브 콘텐츠 제작에 필요한 전 과정을 단일 프로그램으로 통합하는 것이 VIRDY의 핵심 가치이다.</p><hr></p><h2>2. 핵심 기획</h2><h3>2.1 제품 비전</h3><p><strong>"Mocap 라이브 콘텐츠 제작의 진입 장벽을 낮추고, 개인부터 스튜디오까지 하나의 도구로 커버한다."</strong></p><p>기존 모캡 라이브 제작 환경은 여러 프로그램을 조합해야 하고, 멀티유저 협업이 어려우며, 각 장비별 별도 솔루션이 필요했다. VIRDY는 이를 하나로 통합한다.</p><h3>2.2 핵심 가치</h3><table>
 <thead><tr><th>가치</th><th>설명</th></tr></thead>
@@ -329,7 +400,7 @@
 <tr><td><strong>트래커 시스템</strong></td><td>Facial 5종 + Body 5종 + Hand 4종 연동, 캘리브레이션</td><td>✅</td></tr>
 <tr><td><strong>카메라 시스템</strong></td><td>10채널 가상 카메라, 4가지 View 모드, Channel Link</td><td>✅</td></tr>
 <tr><td><strong>월드 시스템</strong></td><td>AssetBundle 커스텀 월드, Public/Private 공유, 라이팅 제어</td><td>✅</td></tr>
-<tr><td><strong>네트워크</strong></td><td>Photon Fusion 2 기반 최대 100명 세션, 데이터 압축 동기화</td><td>✅</td></tr>
+<tr><td><strong>네트워크</strong></td><td>Photon Fusion 기반 최대 100명 세션, 데이터 압축 동기화</td><td>✅</td></tr>
 <tr><td><strong>채팅</strong></td><td>월드 내 텍스트 채팅</td><td>✅</td></tr>
 <tr><td><strong>친구 시스템</strong></td><td>Firebase 기반 친구 목록, Algolia 검색, Invite / Join 기능</td><td>✅</td></tr>
 <tr><td><strong>SDK</strong></td><td>월드/아바타 빌드, 인터랙티브 기능, 외부 배포 예정</td><td>🚧</td></tr>
@@ -1301,7 +1372,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 </section>
 <section id="02_Features_05_Network_System" class="doc-section">
 <div class="doc-header"><span class="doc-category">핵심 기능</span></div>
-<h1>네트워크 시스템</h1><hr></p><h2>1. 개요</h2><p>네트워크 시스템은 Photon Fusion 2 Shared Mode를 기반으로 VIRDY의 실시간 멀티유저 협업을 지원한다. 최대 100명이 동시 접속하여 아바타, 카메라, 채팅을 실시간으로 동기화하며, 데이터 압축과 보간 기술로 네트워크 대역폭을 최적화한다.</p><hr></p><h2>2. 핵심 기획</h2><h3>2.1 네트워크 구성요소</h3><table>
+<h1>네트워크 시스템</h1><hr></p><h2>1. 개요</h2><p>네트워크 시스템은 Photon Fusion Shared Mode를 기반으로 VIRDY의 실시간 멀티유저 협업을 지원한다. 최대 100명이 동시 접속하여 아바타, 카메라, 채팅을 실시간으로 동기화하며, 데이터 압축과 보간 기술로 네트워크 대역폭을 최적화한다.</p><hr></p><h2>2. 핵심 기획</h2><h3>2.1 네트워크 구성요소</h3><table>
 <thead><tr><th>구성요소</th><th>역할</th></tr></thead>
 <tbody>
 <tr><td><strong>FusionService</strong></td><td>세션 수명주기 관리 (생성, 참가, 종료)</td></tr>
@@ -1315,7 +1386,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 <h3>2.2 기본 설정</h3><table>
 <thead><tr><th>항목</th><th>값</th></tr></thead>
 <tbody>
-<tr><td>게임 모드</td><td>Photon Fusion 2 Shared Mode</td></tr>
+<tr><td>게임 모드</td><td>Photon Fusion Shared Mode</td></tr>
 <tr><td>최대 플레이어</td><td>100명</td></tr>
 <tr><td>로비 유형</td><td>Custom</td></tr>
 <tr><td>로비 이름</td><td>VIRDY.{버전}</td></tr>
@@ -1501,7 +1572,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 <tr><td>제어권</td><td>한 번에 1명만 스폰포인트 제어 가능</td></tr>
 <tr><td>요청 방식</td><td>RPC로 StateAuthority에 제어권 요청</td></tr>
 </tbody></table>
-<hr></p><h2>3. 설계 시 고려사항</h2><h3>3.1 Shared Mode 특성</h3><p>Photon Fusion 2 Shared Mode를 사용하므로:</p><p><li>각 플레이어가 자신의 오브젝트에 대한 StateAuthority를 가짐</li>
+<hr></p><h2>3. 설계 시 고려사항</h2><h3>3.1 Shared Mode 특성</h3><p>Photon Fusion Shared Mode를 사용하므로:</p><p><li>각 플레이어가 자신의 오브젝트에 대한 StateAuthority를 가짐</li>
 <li>서버가 아닌 클라이언트가 자신의 데이터를 직접 업데이트</li>
 <li>호스트 없이 모든 클라이언트가 동등한 권한</li></p><h3>3.2 대역폭 관리</h3><p>100명 동시 접속 시 데이터 양이 급증하므로:</p><p><li>프레임당 최대 3명의 액터만 서버 업데이트 (분산 처리)</li>
 <li>Quaternion 50% 압축 + BlendShape 75% 압축</li>
@@ -2858,13 +2929,13 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 </section>
 <section id="05_Technical_01_Architecture" class="doc-section">
 <div class="doc-header"><span class="doc-category">기술 설계</span></div>
-<h1>기술 아키텍처</h1><hr></p><h2>1. 개요</h2><p>VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리케이션이다. 서버 로직은 Firebase (Auth, Firestore, Storage, Functions)와 Photon Fusion 2에 위임하며, 클라이언트는 3개 씬 구조(Sign → Lobby → World)와 Context 서비스 로케이터 패턴을 중심으로 설계된다.</p><hr></p><h2>2. 핵심 기획</h2><h3>2.1 기술 스택</h3><h4>핵심 기술</h4><table>
+<h1>기술 아키텍처</h1><hr></p><h2>1. 개요</h2><p>VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리케이션이다. 서버 로직은 Firebase (Auth, Firestore, Storage, Functions)와 Photon Fusion에 위임하며, 클라이언트는 3개 씬 구조(Sign → Lobby → World)와 Context 서비스 로케이터 패턴을 중심으로 설계된다.</p><hr></p><h2>2. 핵심 기획</h2><h3>2.1 기술 스택</h3><h4>핵심 기술</h4><table>
 <thead><tr><th>영역</th><th>기술</th><th>버전/모드</th></tr></thead>
 <tbody>
 <tr><td>게임 엔진</td><td>Unity</td><td>2022.3.62f3 LTS</td></tr>
 <tr><td>렌더 파이프라인</td><td>Universal Render Pipeline (URP)</td><td>14.0.12</td></tr>
 <tr><td>렌더링 모드</td><td>Forward+</td><td>-</td></tr>
-<tr><td>네트워킹</td><td>Photon Fusion 2</td><td>Shared Mode</td></tr>
+<tr><td>네트워킹</td><td>Photon Fusion</td><td>Shared Mode</td></tr>
 <tr><td>백엔드</td><td>Firebase</td><td>Auth, Firestore, Storage, Functions</td></tr>
 <tr><td>채팅</td><td>Photon Chat</td><td>-</td></tr>
 </tbody></table>
@@ -2935,7 +3006,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 <tr><td>MotionTrackerData</td><td>SteamVR, VMCProtocol, Xsens, Vicon, MOVIN</td></tr>
 <tr><td>HandTrackerData</td><td>LeapMotion, Manus, Mollisen, StretchSense</td></tr>
 </tbody></table>
-<h4>FieldData 시스템</h4><p>StructuredData는 리플렉션 기반 속성 시스템(FieldData)을 사용한다. `[FieldData]` 어트리뷰트가 적용된 필드는 동적 get/set이 가능하며, 값 변경 시 `OnFieldDataChanged` 이벤트가 트리거된다.</p><h3>2.5 네트워크 오브젝트 계층</h3><p>Photon Fusion 2 Shared Mode로 동작하며, 네트워크 오브젝트는 아래 구조를 따른다.</p><table>
+<h4>FieldData 시스템</h4><p>StructuredData는 리플렉션 기반 속성 시스템(FieldData)을 사용한다. `[FieldData]` 어트리뷰트가 적용된 필드는 동적 get/set이 가능하며, 값 변경 시 `OnFieldDataChanged` 이벤트가 트리거된다.</p><h3>2.5 네트워크 오브젝트 계층</h3><p>Photon Fusion Shared Mode로 동작하며, 네트워크 오브젝트는 아래 구조를 따른다.</p><table>
 <thead><tr><th>네트워크 오브젝트</th><th>역할</th><th>주요 데이터</th></tr></thead>
 <tbody>
 <tr><td>NetworkGame</td><td>세션 루트</td><td>Players[255], Channels[255], Actors[]</td></tr>
@@ -3041,7 +3112,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 <tr><td>씬 전환 시에도 서비스 유지</td><td>의존성이 명시적이지 않음</td></tr>
 <tr><td>초기 설정이 단순</td><td>서비스 간 순환 참조 가능성</td></tr>
 </tbody></table>
-향후 의존성 주입(DI) 컨테이너로의 전환을 고려할 수 있다.</p><h3>3.3 Shared Mode의 특성</h3><p>Photon Fusion 2 Shared Mode는 서버 권한(Server Authority) 없이 클라이언트 간 데이터를 동기화한다. 각 클라이언트가 자신의 NetworkObject에 대한 State Authority를 갖는다.</p><table>
+향후 의존성 주입(DI) 컨테이너로의 전환을 고려할 수 있다.</p><h3>3.3 Shared Mode의 특성</h3><p>Photon Fusion Shared Mode는 서버 권한(Server Authority) 없이 클라이언트 간 데이터를 동기화한다. 각 클라이언트가 자신의 NetworkObject에 대한 State Authority를 갖는다.</p><table>
 <thead><tr><th>특성</th><th>설명</th></tr></thead>
 <tbody>
 <tr><td>서버 권한</td><td>없음 (각 클라이언트가 자체 객체 권한)</td></tr>
@@ -3081,7 +3152,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 <thead><tr><th>영역</th><th>상태</th><th>완성도</th></tr></thead>
 <tbody>
 <tr><td>핵심 기능 (아바타, 트래커, 카메라, 월드)</td><td>✅ 구현 완료</td><td>90%</td></tr>
-<tr><td>네트워킹 (Photon Fusion 2, Chat)</td><td>✅ 구현 완료</td><td>95%</td></tr>
+<tr><td>네트워킹 (Photon Fusion, Chat)</td><td>✅ 구현 완료</td><td>95%</td></tr>
 <tr><td>UI/UX</td><td>✅ 구현 완료</td><td>85%</td></tr>
 <tr><td>SDK</td><td>✅ 구현 완료</td><td>80%</td></tr>
 <tr><td>라이선스</td><td>🚧 기본 구현</td><td>30%</td></tr>
@@ -3141,7 +3212,7 @@ Facial Blendshape Config를 통해 더욱 상세한 설정이 가능하다.</p><
 <h4>네트워크 시스템</h4><table>
 <thead><tr><th>기능</th><th>상태</th><th>비고</th></tr></thead>
 <tbody>
-<tr><td>Photon Fusion 2 Shared Mode</td><td>✅ 완료</td><td></td></tr>
+<tr><td>Photon Fusion Shared Mode</td><td>✅ 완료</td><td></td></tr>
 <tr><td>세션 생성/참가</td><td>✅ 완료</td><td></td></tr>
 <tr><td>아바타 동기화 (압축 포함)</td><td>✅ 완료</td><td></td></tr>
 <tr><td>카메라 동기화</td><td>✅ 완료</td><td></td></tr>

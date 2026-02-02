@@ -130,6 +130,13 @@ def generate_html():
     base_dir = Path(__file__).parent
     documents = []
 
+    # UPDATES.md 읽기
+    updates_content = ""
+    updates_path = base_dir / "UPDATES.md"
+    if updates_path.exists():
+        with open(updates_path, 'r', encoding='utf-8') as f:
+            updates_content = f.read()
+
     # 문서 읽기
     for doc_path in DOCUMENT_ORDER:
         full_path = base_dir / doc_path
@@ -155,6 +162,14 @@ def generate_html():
 
     # 네비게이션 생성
     nav_html = ""
+
+    # 업데이트 섹션 추가
+    if updates_content:
+        nav_html += '<div class="nav-category">📝 최신 업데이트</div>\n<ul>\n'
+        nav_html += '<li><a href="#updates" onclick="showSection(\'updates\')">최근 4주 업데이트</a></li>\n'
+        nav_html += '<li><a href="#changelog" onclick="showSection(\'changelog\')">전체 변경 이력</a></li>\n'
+        nav_html += '</ul>\n'
+
     current_category = None
     for doc in documents:
         if doc['category'] != current_category:
@@ -171,6 +186,26 @@ def generate_html():
 
     # 콘텐츠 생성
     content_html = ""
+
+    # 업데이트 섹션 추가
+    if updates_content:
+        updates_html = convert_md_to_html(updates_content)
+        content_html += '<section id="updates" class="doc-section">\n'
+        content_html += '<div class="doc-header"><span class="doc-category">📝 최신 업데이트</span></div>\n'
+        content_html += updates_html
+        content_html += '\n</section>\n'
+
+        # CHANGELOG 섹션 추가
+        changelog_path = base_dir / "CHANGELOG.md"
+        if changelog_path.exists():
+            with open(changelog_path, 'r', encoding='utf-8') as f:
+                changelog_content = f.read()
+            changelog_html = convert_md_to_html(changelog_content)
+            content_html += '<section id="changelog" class="doc-section">\n'
+            content_html += '<div class="doc-header"><span class="doc-category">📋 전체 변경 이력</span></div>\n'
+            content_html += changelog_html
+            content_html += '\n</section>\n'
+
     for doc in documents:
         content_html += f'<section id="{doc["id"]}" class="doc-section">\n'
         content_html += f'<div class="doc-header"><span class="doc-category">{CATEGORIES.get(doc["category"], {}).get("name", doc["category"])}</span></div>\n'

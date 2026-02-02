@@ -42,13 +42,20 @@ VIRDY_Plan_Document/
     └── 02_Development_Status.md
 ```
 
+## 최신 업데이트
+
+최근 4주간의 주요 변경사항은 [UPDATES.md](UPDATES.md)에서 확인하세요.
+전체 변경 이력은 [CHANGELOG.md](CHANGELOG.md)를 참고하세요.
+
+---
+
 ## 빠른 시작
 
 ### 문서 확인 방법
 
 **방법 1: HTML 뷰어 (권장)**
 
-`VIRDY_Onboarding.html` 파일을 브라우저에서 열면 사이드바 네비게이션과 검색 기능이 포함된 통합 문서를 확인할 수 있습니다.
+`VIRDY_Onboarding.html` 파일을 브라우저에서 열면 사이드바 네비게이션과 최신 업데이트 섹션이 포함된 통합 문서를 확인할 수 있습니다.
 
 ```bash
 # HTML 파일 열기
@@ -76,7 +83,7 @@ VIRDY Notion 워크스페이스와 동기화되어 있어 협업 편집 및 댓�
 - 트래커 연동 (14종 이상 장비)
 - 카메라 시스템 (10채널 가상 카메라)
 - 월드 관리 (AssetBundle, 공유 정책)
-- 네트워크 동기화 (Photon Fusion 2)
+- 네트워크 동기화 (Photon Fusion)
 - SDK (커스텀 콘텐츠 제작)
 
 ### 03_Operations (운영 기획)

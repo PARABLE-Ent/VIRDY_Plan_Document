@@ -8,7 +8,7 @@
 
 ## 1. 개요
 
-VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리케이션이다. 서버 로직은 Firebase (Auth, Firestore, Storage, Functions)와 Photon Fusion 2에 위임하며, 클라이언트는 3개 씬 구조(Sign → Lobby → World)와 Context 서비스 로케이터 패턴을 중심으로 설계된다.
+VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리케이션이다. 서버 로직은 Firebase (Auth, Firestore, Storage, Functions)와 Photon Fusion에 위임하며, 클라이언트는 3개 씬 구조(Sign → Lobby → World)와 Context 서비스 로케이터 패턴을 중심으로 설계된다.
 
 ---
 
@@ -23,7 +23,7 @@ VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리
 | 게임 엔진 | Unity | 2022.3.62f3 LTS |
 | 렌더 파이프라인 | Universal Render Pipeline (URP) | 14.0.12 |
 | 렌더링 모드 | Forward+ | - |
-| 네트워킹 | Photon Fusion 2 | Shared Mode |
+| 네트워킹 | Photon Fusion | Shared Mode |
 | 백엔드 | Firebase | Auth, Firestore, Storage, Functions |
 | 채팅 | Photon Chat | - |
 
@@ -117,7 +117,7 @@ StructuredData는 리플렉션 기반 속성 시스템(FieldData)을 사용한�
 
 ### 2.5 네트워크 오브젝트 계층
 
-Photon Fusion 2 Shared Mode로 동작하며, 네트워크 오브젝트는 아래 구조를 따른다.
+Photon Fusion Shared Mode로 동작하며, 네트워크 오브젝트는 아래 구조를 따른다.
 
 | 네트워크 오브젝트 | 역할 | 주요 데이터 |
 |-------------------|------|-------------|
@@ -248,7 +248,7 @@ Firebase 서비스는 4개 하위 모듈로 구성된다.
 
 ### 3.3 Shared Mode의 특성
 
-Photon Fusion 2 Shared Mode는 서버 권한(Server Authority) 없이 클라이언트 간 데이터를 동기화한다. 각 클라이언트가 자신의 NetworkObject에 대한 State Authority를 갖는다.
+Photon Fusion Shared Mode는 서버 권한(Server Authority) 없이 클라이언트 간 데이터를 동기화한다. 각 클라이언트가 자신의 NetworkObject에 대한 State Authority를 갖는다.
 
 | 특성 | 설명 |
 |------|------|
