@@ -1,20 +1,20 @@
-# VIRDY Plan Document
+# VIRDY 기획 문서
 
-> Comprehensive planning and design documentation for the VIRDY Solution
+> VIRDY 솔루션의 기획, 설계, 운영 문서를 통합 관리하는 리포지토리
 
-This repository serves as the centralized documentation hub for VIRDY's product planning, technical design, and operational strategies. It provides structured specifications across all phases of product development.
+이 리포지토리는 VIRDY의 제품 기획, 기술 설계, 운영 전략을 체계적으로 정리한 문서 허브입니다. 제품 개발의 모든 단계에 걸친 상세한 명세를 제공합니다.
 
-## Overview
+## 개요
 
-VIRDY is an all-in-one motion capture live streaming solution for virtual creators. This repository contains the complete planning documentation organized into five primary categories:
+VIRDY는 버추얼 크리에이터를 위한 올인원 모션캡처 라이브 스트리밍 솔루션입니다. 이 리포지토리는 5개의 주요 카테고리로 구성된 전체 기획 문서를 포함합니다:
 
-- **Product**: Core product definition and user flows
-- **Features**: Detailed specifications for key features
-- **Operations**: User management, licensing, and security policies
-- **Design**: UI/UX specifications and design guidelines
-- **Technical**: System architecture and development status
+- **Product**: 제품 정의 및 사용자 플로우
+- **Features**: 핵심 기능 상세 명세
+- **Operations**: 사용자 관리, 라이선스, 보안 정책
+- **Design**: UI/UX 명세 및 디자인 가이드라인
+- **Technical**: 시스템 아키텍처 및 개발 현황
 
-## Repository Structure
+## 리포지토리 구조
 
 ```
 VIRDY_Plan_Document/
@@ -42,107 +42,107 @@ VIRDY_Plan_Document/
     └── 02_Development_Status.md
 ```
 
-## Quick Start
+## 빠른 시작
 
-### Viewing Documentation
+### 문서 확인 방법
 
-**Option 1: HTML Viewer (Recommended)**
+**방법 1: HTML 뷰어 (권장)**
 
-Open `VIRDY_Onboarding.html` in your browser for an integrated view with navigation sidebar and search functionality.
+`VIRDY_Onboarding.html` 파일을 브라우저에서 열면 사이드바 네비게이션과 검색 기능이 포함된 통합 문서를 확인할 수 있습니다.
 
 ```bash
-# Open the HTML file
+# HTML 파일 열기
 start VIRDY_Onboarding.html  # Windows
 open VIRDY_Onboarding.html   # macOS
 xdg-open VIRDY_Onboarding.html  # Linux
 ```
 
-**Option 2: Markdown Files**
+**방법 2: 마크다운 파일**
 
-Navigate through individual `.md` files organized by category in their respective folders.
+각 카테고리 폴더 내의 개별 `.md` 파일을 직접 확인할 수 있습니다.
 
-**Option 3: Notion**
+**방법 3: Notion**
 
-Documentation is synchronized with VIRDY Notion workspace for collaborative editing and comments.
+VIRDY Notion 워크스페이스와 동기화되어 있어 협업 편집 및 댓글 기능을 사용할 수 있습니다.
 
-## Documentation Categories
+## 문서 카테고리
 
-### 01_Product
-Product vision, target users, and core value propositions. Includes complete user journey flows from authentication to production.
+### 01_Product (제품 정의)
+제품 비전, 타겟 사용자, 핵심 가치 제안을 정의합니다. 인증부터 프로덕션까지 전체 사용자 여정 플로우를 포함합니다.
 
-### 02_Features
-Technical specifications for:
-- Avatar system (VRM support, BlendShape configuration)
-- Tracker integration (14+ device types)
-- Camera system (10-channel virtual cameras)
-- World management (AssetBundle, sharing policies)
-- Network synchronization (Photon Fusion 2)
-- SDK for custom content creation
+### 02_Features (핵심 기능)
+다음 기능들의 기술 명세를 포함합니다:
+- 아바타 시스템 (VRM 지원, BlendShape 설정)
+- 트래커 연동 (14종 이상 장비)
+- 카메라 시스템 (10채널 가상 카메라)
+- 월드 관리 (AssetBundle, 공유 정책)
+- 네트워크 동기화 (Photon Fusion 2)
+- SDK (커스텀 콘텐츠 제작)
 
-### 03_Operations
-Operational policies covering:
-- User role definitions (Creator vs Manager)
-- SaaS licensing tiers (Free/Pro/Studio/Enterprise)
-- Security protocols and data protection
-- Session lifecycle management
-- Risk mitigation strategies
-- Account system architecture
+### 03_Operations (운영 기획)
+운영 정책을 다룹니다:
+- 사용자 역할 정의 (Creator vs Manager)
+- SaaS 라이선스 티어 (Free/Pro/Studio/Enterprise)
+- 보안 프로토콜 및 데이터 보호
+- 세션 생명주기 관리
+- 리스크 완화 전략
+- 계정 시스템 아키텍처
 
-### 04_Design
-UI/UX specifications and design system guidelines.
+### 04_Design (UI/UX)
+UI/UX 명세 및 디자인 시스템 가이드라인을 포함합니다.
 
-### 05_Technical
-System architecture documentation and current development status tracking.
+### 05_Technical (기술 설계)
+시스템 아키텍처 문서 및 현재 개발 현황을 추적합니다.
 
-## Document Format
+## 문서 형식
 
-All planning documents follow a standardized structure:
+모든 기획 문서는 다음의 표준화된 구조를 따릅니다:
 
 ```markdown
-# Document Title
+# 문서 제목
 
-> **Document Version**: X.X
-> **Last Updated**: YY.MM.DD HH:MM
-> **Author**: Name
+> **문서 버전**: X.X
+> **최종 수정일**: YY.MM.DD HH:MM
+> **작성자**: 이름
 
-## 1. Overview
-## 2. Core Specifications
-## 3. Design Considerations
-## 4. Edge Cases and Exception Handling
-## 5. Future Extensibility
+## 1. 개요
+## 2. 핵심 기획
+## 3. 설계 시 고려사항
+## 4. 엣지 케이스 및 예외 처리
+## 5. 향후 확장 가능성
 ```
 
-## Contributing
+## 기여하기
 
-This repository is maintained by VIRDY Studio. For contributions or suggestions:
+이 리포지토리는 VIRDY Studio에서 관리합니다. 기여 또는 제안 사항이 있는 경우:
 
-1. Check existing documentation for context
-2. Follow the established document format
-3. Ensure changes are reflected in both local `.md` files and Notion workspace
-4. Update `VIRDY_Onboarding.html` by running `generate_onboarding.py`
+1. 기존 문서를 먼저 확인하여 맥락을 파악합니다
+2. 정해진 문서 형식을 따릅니다
+3. 로컬 `.md` 파일과 Notion 워크스페이스 모두에 변경사항이 반영되도록 합니다
+4. `generate_onboarding.py`를 실행하여 `VIRDY_Onboarding.html`을 업데이트합니다
 
-## Generating HTML Documentation
+## HTML 문서 생성
 
-To regenerate the integrated HTML documentation:
+통합 HTML 문서를 재생성하려면:
 
 ```bash
 cd VIRDY_Plan_Document
 python generate_onboarding.py
 ```
 
-This creates `VIRDY_Onboarding.html` with all documents integrated into a single-page viewer.
+이 명령은 모든 문서가 통합된 단일 페이지 뷰어인 `VIRDY_Onboarding.html`을 생성합니다.
 
-## Related Resources
+## 관련 리소스
 
-- **VIRDY Framework**: [Unity client repository](https://github.com/PARABLE-Ent/VIRDY-Framework-Dev)
-- **VIRDY Docs**: [Official documentation site](https://parable-ent.github.io/VIRDY-Docs/)
-- **Notion Workspace**: VIRDY Planning (internal)
+- **VIRDY Framework**: [Unity 클라이언트 리포지토리](https://github.com/PARABLE-Ent/VIRDY-Framework-Dev)
+- **VIRDY Docs**: [공식 문서 사이트](https://parable-ent.github.io/VIRDY-Docs/)
+- **Notion 워크스페이스**: VIRDY Planning (내부용)
 
-## License
+## 라이선스
 
 Copyright © 2026 VIRDY Studio. All rights reserved.
 
 ---
 
-**Maintained by**: VIRDY Studio
-**For inquiries**: Contact through official channels
+**관리**: VIRDY Studio
+**문의**: 공식 채널을 통해 연락주세요
