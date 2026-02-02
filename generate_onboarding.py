@@ -1,0 +1,464 @@
+#!/usr/bin/env python3
+"""
+VIRDY 기획 문서 통합 HTML 생성기
+모든 .md 파일을 읽어 단일 HTML 온보딩 문서로 변환합니다.
+"""
+
+import os
+import re
+from pathlib import Path
+from datetime import datetime
+
+# 문서 카테고리 정의
+CATEGORIES = {
+    "01_Product": {"name": "제품 정의", "icon": "📦"},
+    "02_Features": {"name": "핵심 기능", "icon": "⚙️"},
+    "03_Operations": {"name": "운영 기획", "icon": "🔒"},
+    "04_Design": {"name": "UI/UX", "icon": "🎨"},
+    "05_Technical": {"name": "기술 설계", "icon": "🛠️"}
+}
+
+# 문서 순서 정의
+DOCUMENT_ORDER = [
+    "01_Product/01_Product_Overview.md",
+    "01_Product/02_User_Flow.md",
+    "02_Features/01_Avatar_System.md",
+    "02_Features/02_Tracker_System.md",
+    "02_Features/03_Camera_System.md",
+    "02_Features/04_World_System.md",
+    "02_Features/05_Network_System.md",
+    "02_Features/06_SDK.md",
+    "03_Operations/01_User_Roles.md",
+    "03_Operations/02_License_System.md",
+    "03_Operations/03_Security.md",
+    "03_Operations/04_Data_Lifecycle.md",
+    "03_Operations/05_Risk_Management.md",
+    "03_Operations/06_Account_System.md",
+    "04_Design/01_UI_Specification.md",
+    "05_Technical/01_Architecture.md",
+    "05_Technical/02_Development_Status.md"
+]
+
+
+def extract_title(md_content):
+    """Markdown 파일에서 제목 추출"""
+    lines = md_content.split('\n')
+    for line in lines:
+        if line.startswith('# '):
+            return line[2:].strip()
+    return "제목 없음"
+
+
+def convert_md_to_html(md_content):
+    """간단한 Markdown → HTML 변환"""
+    html = md_content
+
+    # 코드 블록 (```로 둘러싸인 부분)
+    html = re.sub(r'```(\w+)?\n(.*?)\n```', r'<pre><code class="\1">\2</code></pre>', html, flags=re.DOTALL)
+
+    # 인용구 제거 (문서 헤더용)
+    html = re.sub(r'^>\s*\*\*문서 버전\*\*.*$', '', html, flags=re.MULTILINE)
+    html = re.sub(r'^>\s*\*\*최종 수정일\*\*.*$', '', html, flags=re.MULTILINE)
+    html = re.sub(r'^>\s*\*\*작성자\*\*.*$', '', html, flags=re.MULTILINE)
+    html = re.sub(r'^>\s*$', '', html, flags=re.MULTILINE)
+
+    # 제목 변환
+    html = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
+    html = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
+    html = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
+    html = re.sub(r'^#### (.+)$', r'<h4>\1</h4>', html, flags=re.MULTILINE)
+
+    # 표 변환 (간단한 버전)
+    def convert_table(match):
+        lines = match.group(0).split('\n')
+        result = '<table>\n'
+        for i, line in enumerate(lines):
+            if not line.strip() or '---' in line:
+                continue
+            cells = [cell.strip() for cell in line.split('|')[1:-1]]
+            if i == 0:
+                result += '<thead><tr>'
+                for cell in cells:
+                    result += f'<th>{cell}</th>'
+                result += '</tr></thead>\n<tbody>\n'
+            else:
+                result += '<tr>'
+                for cell in cells:
+                    result += f'<td>{cell}</td>'
+                result += '</tr>\n'
+        result += '</tbody></table>\n'
+        return result
+
+    # 표 패턴 찾기
+    table_pattern = r'(\|.+\|[\r\n]+\|[-:\s|]+\|[\r\n]+(?:\|.+\|[\r\n]*)*)'
+    html = re.sub(table_pattern, convert_table, html, flags=re.MULTILINE)
+
+    # 볼드/이탤릭
+    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html)
+    html = re.sub(r'\*(.+?)\*', r'<em>\1</em>', html)
+
+    # 링크 제거 (내부 문서 링크는 단일 HTML이므로 불필요)
+    html = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', html)
+
+    # 리스트
+    html = re.sub(r'^\- (.+)$', r'<li>\1</li>', html, flags=re.MULTILINE)
+    html = re.sub(r'(<li>.*</li>\n?)+', r'<ul>\g<0></ul>', html, flags=re.DOTALL)
+
+    # 수평선
+    html = re.sub(r'^---$', r'<hr>', html, flags=re.MULTILINE)
+
+    # 줄바꿈
+    html = re.sub(r'<br\s*/?>', r'<br>', html)
+    html = html.replace('\n\n', '</p><p>')
+
+    # 단락 감싸기
+    html = f'<p>{html}</p>'
+    html = html.replace('<p><h', '<h').replace('</h1></p>', '</h1>')
+    html = html.replace('</h2></p>', '</h2>').replace('</h3></p>', '</h3>')
+    html = html.replace('</h4></p>', '</h4>')
+    html = html.replace('<p><hr></p>', '<hr>')
+    html = html.replace('<p><table>', '<table>').replace('</table></p>', '</table>')
+    html = html.replace('<p><ul>', '<ul>').replace('</ul></p>', '</ul>')
+    html = html.replace('<p><pre>', '<pre>').replace('</pre></p>', '</pre>')
+    html = html.replace('<p></p>', '')
+
+    return html
+
+
+def generate_html():
+    """통합 HTML 생성"""
+    base_dir = Path(__file__).parent
+    documents = []
+
+    # 문서 읽기
+    for doc_path in DOCUMENT_ORDER:
+        full_path = base_dir / doc_path
+        if not full_path.exists():
+            print(f"[WARN] 파일 없음: {doc_path}")
+            continue
+
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        title = extract_title(content)
+        html_content = convert_md_to_html(content)
+        category = doc_path.split('/')[0]
+
+        documents.append({
+            'path': doc_path,
+            'title': title,
+            'content': html_content,
+            'category': category,
+            'id': doc_path.replace('/', '_').replace('.md', '')
+        })
+        print(f"[OK] {title}")
+
+    # 네비게이션 생성
+    nav_html = ""
+    current_category = None
+    for doc in documents:
+        if doc['category'] != current_category:
+            if current_category:
+                nav_html += "</ul>\n"
+            current_category = doc['category']
+            cat_info = CATEGORIES.get(current_category, {"name": current_category, "icon": "📄"})
+            nav_html += f'<div class="nav-category">{cat_info["icon"]} {cat_info["name"]}</div>\n<ul>\n'
+
+        nav_html += f'<li><a href="#{doc["id"]}" onclick="showSection(\'{doc["id"]}\')">{doc["title"]}</a></li>\n'
+
+    if current_category:
+        nav_html += "</ul>\n"
+
+    # 콘텐츠 생성
+    content_html = ""
+    for doc in documents:
+        content_html += f'<section id="{doc["id"]}" class="doc-section">\n'
+        content_html += f'<div class="doc-header"><span class="doc-category">{CATEGORIES.get(doc["category"], {}).get("name", doc["category"])}</span></div>\n'
+        content_html += doc["content"]
+        content_html += '\n</section>\n'
+
+    # 최종 HTML 조합
+    html_template = f"""<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIRDY 온보딩 문서</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }}
+
+        .container {{
+            display: flex;
+            min-height: 100vh;
+        }}
+
+        /* 사이드바 */
+        .sidebar {{
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }}
+
+        .sidebar-header {{
+            padding: 30px 20px;
+            background: #1a252f;
+            border-bottom: 2px solid #34495e;
+        }}
+
+        .sidebar-header h1 {{
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #3498db;
+        }}
+
+        .sidebar-header p {{
+            font-size: 12px;
+            color: #95a5a6;
+        }}
+
+        .nav-category {{
+            padding: 15px 20px 5px;
+            font-weight: bold;
+            font-size: 13px;
+            color: #ecf0f1;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }}
+
+        .sidebar ul {{
+            list-style: none;
+            padding: 0 10px 15px;
+        }}
+
+        .sidebar li {{
+            margin: 0;
+        }}
+
+        .sidebar a {{
+            display: block;
+            padding: 8px 15px;
+            color: #bdc3c7;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }}
+
+        .sidebar a:hover {{
+            background: #34495e;
+            color: #fff;
+            transform: translateX(5px);
+        }}
+
+        /* 메인 콘텐츠 */
+        .main-content {{
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px;
+            max-width: 1200px;
+        }}
+
+        .doc-section {{
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+
+        .doc-header {{
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }}
+
+        .doc-category {{
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }}
+
+        h1 {{
+            font-size: 32px;
+            margin: 20px 0;
+            color: #2c3e50;
+        }}
+
+        h2 {{
+            font-size: 24px;
+            margin: 30px 0 15px;
+            color: #34495e;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }}
+
+        h3 {{
+            font-size: 20px;
+            margin: 25px 0 10px;
+            color: #555;
+        }}
+
+        h4 {{
+            font-size: 16px;
+            margin: 20px 0 10px;
+            color: #666;
+        }}
+
+        p {{
+            margin: 10px 0;
+            color: #555;
+        }}
+
+        /* 테이블 */
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }}
+
+        th {{
+            background: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }}
+
+        td {{
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }}
+
+        tr:hover {{
+            background: #f8f9fa;
+        }}
+
+        /* 코드 */
+        code {{
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }}
+
+        pre {{
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }}
+
+        pre code {{
+            background: none;
+            color: inherit;
+            padding: 0;
+        }}
+
+        /* 리스트 */
+        ul {{
+            margin: 15px 0;
+            padding-left: 30px;
+        }}
+
+        li {{
+            margin: 8px 0;
+            color: #555;
+        }}
+
+        /* 구분선 */
+        hr {{
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 30px 0;
+        }}
+
+        /* 강조 */
+        strong {{
+            color: #2c3e50;
+            font-weight: 600;
+        }}
+
+        em {{
+            color: #555;
+        }}
+
+        /* 반응형 */
+        @media (max-width: 768px) {{
+            .sidebar {{
+                width: 100%;
+                position: relative;
+                height: auto;
+            }}
+
+            .main-content {{
+                margin-left: 0;
+                padding: 20px;
+            }}
+        }}
+    </style>
+    <script>
+        function showSection(id) {{
+            const section = document.getElementById(id);
+            if (section) {{
+                section.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+            }}
+        }}
+    </script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🎬 VIRDY</h1>
+                <p>기획 문서 통합본</p>
+                <p style="margin-top: 10px; font-size: 11px;">생성일: {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+            </div>
+            <nav>
+                {nav_html}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            {content_html}
+        </main>
+    </div>
+</body>
+</html>
+"""
+
+    # HTML 파일 저장
+    output_path = base_dir / 'VIRDY_Onboarding.html'
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(html_template)
+
+    print(f"\n[SUCCESS] 생성 완료: {output_path}")
+    print(f"[INFO] 총 {len(documents)}개 문서 통합")
+    return output_path
+
+
+if __name__ == '__main__':
+    generate_html()
