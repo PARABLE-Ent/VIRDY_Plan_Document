@@ -10,11 +10,22 @@
 ## [미배포] - 2026-02-02
 
 ### 추가됨
+- **03_Operations/07_Cost_Analysis.md**: 비용 분석 및 수익성 문서 신규 작성
+  - 사용자별 월간 원가 산출 (Light/Heavy/Worst Case)
+  - 플랜별 마진 분석 (Starter 96%, Pro 56%)
+  - 손익분기점(BEP) 분석 (서버 비용 기준 56명)
+  - 5단계 비용 방어 체계 상세 명세
+  - 시나리오별 비용 시뮬레이션 (정상/헤비/악용 패턴)
+  - Photon/GCP/R2 비용 구성 요소 상세 분석
 - CHANGELOG.md: 전체 변경 이력 추적 시스템 도입
-- UPDATES.md: 최근 4주 업데이트 요약
-- `_updates/` 폴더: 주간 상세 리포트 저장
 - HTML 온보딩 문서 생성기 (`generate_onboarding.py`)
 - 통합 HTML 문서 뷰어 (`VIRDY_Onboarding.html`)
+
+### 수정됨
+- **02_License_System.md**: 비용 분석 문서 링크 추가 (3.1절)
+- **05_Risk_Management.md**: 비용 분석 문서 링크 추가 (R1 리스크)
+- **전체 문서**: "Photon Fusion 2" → "Photon Fusion" 용어 통일
+
 ---
 
 ## [1.0.0] - 2026-01-30

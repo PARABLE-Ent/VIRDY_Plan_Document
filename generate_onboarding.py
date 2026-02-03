@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 VIRDY 기획 문서 통합 HTML 생성기
-모든 .md 파일을 읽어 단일 HTML 온보딩 문서로 변환합니다.
+모든 .md 파일을 읽어 페이지 기반 HTML 온보딩 문서로 변환합니다.
 """
 
 import os
@@ -34,6 +34,7 @@ DOCUMENT_ORDER = [
     "03_Operations/04_Data_Lifecycle.md",
     "03_Operations/05_Risk_Management.md",
     "03_Operations/06_Account_System.md",
+    "03_Operations/07_Cost_Analysis.md",
     "04_Design/01_UI_Specification.md",
     "05_Technical/01_Architecture.md",
     "05_Technical/02_Development_Status.md"
@@ -49,7 +50,21 @@ def extract_title(md_content):
     return "제목 없음"
 
 
-def convert_md_to_html(md_content):
+def extract_h2_sections(md_content):
+    """Markdown에서 h2 섹션 추출 (TOC 생성용)"""
+    sections = []
+    lines = md_content.split('\n')
+    for line in lines:
+        if line.startswith('## '):
+            title = line[3:].strip()
+            # ID 생성 (특수문자 제거, 공백을 하이픈으로)
+            section_id = re.sub(r'[^\w가-힣\s-]', '', title)
+            section_id = re.sub(r'\s+', '-', section_id).lower()
+            sections.append({'title': title, 'id': section_id})
+    return sections
+
+
+def convert_md_to_html(md_content, add_ids=True):
     """간단한 Markdown → HTML 변환"""
     html = md_content
 
@@ -64,7 +79,18 @@ def convert_md_to_html(md_content):
 
     # 제목 변환
     html = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
-    html = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
+
+    # h2에 ID 추가 (TOC 링크용)
+    if add_ids:
+        def add_id_to_h2(match):
+            title = match.group(1)
+            section_id = re.sub(r'[^\w가-힣\s-]', '', title)
+            section_id = re.sub(r'\s+', '-', section_id).lower()
+            return f'<h2 id="{section_id}">{title}</h2>'
+        html = re.sub(r'^## (.+)$', add_id_to_h2, html, flags=re.MULTILINE)
+    else:
+        html = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
+
     html = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
     html = re.sub(r'^#### (.+)$', r'<h4>\1</h4>', html, flags=re.MULTILINE)
 
@@ -137,6 +163,13 @@ def generate_html():
         with open(updates_path, 'r', encoding='utf-8') as f:
             updates_content = f.read()
 
+    # CHANGELOG.md 읽기
+    changelog_content = ""
+    changelog_path = base_dir / "CHANGELOG.md"
+    if changelog_path.exists():
+        with open(changelog_path, 'r', encoding='utf-8') as f:
+            changelog_content = f.read()
+
     # 문서 읽기
     for doc_path in DOCUMENT_ORDER:
         full_path = base_dir / doc_path
@@ -148,7 +181,8 @@ def generate_html():
             content = f.read()
 
         title = extract_title(content)
-        html_content = convert_md_to_html(content)
+        h2_sections = extract_h2_sections(content)
+        html_content = convert_md_to_html(content, add_ids=True)
         category = doc_path.split('/')[0]
 
         documents.append({
@@ -156,18 +190,21 @@ def generate_html():
             'title': title,
             'content': html_content,
             'category': category,
-            'id': doc_path.replace('/', '_').replace('.md', '')
+            'id': doc_path.replace('/', '_').replace('.md', ''),
+            'sections': h2_sections
         })
         print(f"[OK] {title}")
 
-    # 네비게이션 생성
+    # 좌측 네비게이션 생성
     nav_html = ""
 
     # 업데이트 섹션 추가
-    if updates_content:
+    if updates_content or changelog_content:
         nav_html += '<div class="nav-category">📝 최신 업데이트</div>\n<ul>\n'
-        nav_html += '<li><a href="#updates" onclick="showSection(\'updates\')">최근 4주 업데이트</a></li>\n'
-        nav_html += '<li><a href="#changelog" onclick="showSection(\'changelog\')">전체 변경 이력</a></li>\n'
+        if updates_content:
+            nav_html += '<li><a href="#" onclick="showPage(\'updates\'); return false;">최근 4주 업데이트</a></li>\n'
+        if changelog_content:
+            nav_html += '<li><a href="#" onclick="showPage(\'changelog\'); return false;">전체 변경 이력</a></li>\n'
         nav_html += '</ul>\n'
 
     current_category = None
@@ -179,38 +216,45 @@ def generate_html():
             cat_info = CATEGORIES.get(current_category, {"name": current_category, "icon": "📄"})
             nav_html += f'<div class="nav-category">{cat_info["icon"]} {cat_info["name"]}</div>\n<ul>\n'
 
-        nav_html += f'<li><a href="#{doc["id"]}" onclick="showSection(\'{doc["id"]}\')">{doc["title"]}</a></li>\n'
+        nav_html += f'<li><a href="#" onclick="showPage(\'{doc["id"]}\'); return false;" id="nav-{doc["id"]}">{doc["title"]}</a></li>\n'
 
     if current_category:
         nav_html += "</ul>\n"
 
-    # 콘텐츠 생성
-    content_html = ""
+    # 페이지 콘텐츠 생성
+    pages_html = ""
 
-    # 업데이트 섹션 추가
+    # 업데이트 페이지
     if updates_content:
-        updates_html = convert_md_to_html(updates_content)
-        content_html += '<section id="updates" class="doc-section">\n'
-        content_html += '<div class="doc-header"><span class="doc-category">📝 최신 업데이트</span></div>\n'
-        content_html += updates_html
-        content_html += '\n</section>\n'
+        updates_html = convert_md_to_html(updates_content, add_ids=False)
+        updates_sections = extract_h2_sections(updates_content)
+        pages_html += f'''
+        <div class="page-content" id="page-updates">
+            <div class="doc-header"><span class="doc-category">📝 최신 업데이트</span></div>
+            {updates_html}
+        </div>
+        '''
 
-        # CHANGELOG 섹션 추가
-        changelog_path = base_dir / "CHANGELOG.md"
-        if changelog_path.exists():
-            with open(changelog_path, 'r', encoding='utf-8') as f:
-                changelog_content = f.read()
-            changelog_html = convert_md_to_html(changelog_content)
-            content_html += '<section id="changelog" class="doc-section">\n'
-            content_html += '<div class="doc-header"><span class="doc-category">📋 전체 변경 이력</span></div>\n'
-            content_html += changelog_html
-            content_html += '\n</section>\n'
+    # CHANGELOG 페이지
+    if changelog_content:
+        changelog_html = convert_md_to_html(changelog_content, add_ids=False)
+        changelog_sections = extract_h2_sections(changelog_content)
+        pages_html += f'''
+        <div class="page-content" id="page-changelog">
+            <div class="doc-header"><span class="doc-category">📋 전체 변경 이력</span></div>
+            {changelog_html}
+        </div>
+        '''
 
+    # 각 문서 페이지
     for doc in documents:
-        content_html += f'<section id="{doc["id"]}" class="doc-section">\n'
-        content_html += f'<div class="doc-header"><span class="doc-category">{CATEGORIES.get(doc["category"], {}).get("name", doc["category"])}</span></div>\n'
-        content_html += doc["content"]
-        content_html += '\n</section>\n'
+        cat_name = CATEGORIES.get(doc["category"], {}).get("name", doc["category"])
+        pages_html += f'''
+        <div class="page-content" id="page-{doc["id"]}">
+            <div class="doc-header"><span class="doc-category">{cat_name}</span></div>
+            {doc["content"]}
+        </div>
+        '''
 
     # 최종 HTML 조합
     html_template = f"""<!DOCTYPE html>
@@ -238,7 +282,7 @@ def generate_html():
             min-height: 100vh;
         }}
 
-        /* 사이드바 */
+        /* 좌측 사이드바 */
         .sidebar {{
             width: 280px;
             background: #2c3e50;
@@ -247,6 +291,7 @@ def generate_html():
             height: 100vh;
             overflow-y: auto;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
         }}
 
         .sidebar-header {{
@@ -300,20 +345,83 @@ def generate_html():
             transform: translateX(5px);
         }}
 
-        /* 메인 콘텐츠 */
-        .main-content {{
-            flex: 1;
-            margin-left: 280px;
-            padding: 40px;
-            max-width: 1200px;
+        .sidebar a.active {{
+            background: #3498db;
+            color: white;
+            font-weight: bold;
         }}
 
-        .doc-section {{
-            background: white;
+        /* 메인 콘텐츠 영역 */
+        .main-wrapper {{
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+        }}
+
+        .main-content {{
+            flex: 1;
             padding: 40px;
-            margin-bottom: 30px;
+            max-width: 1000px;
+        }}
+
+        /* 우측 TOC */
+        .toc {{
+            width: 250px;
+            position: fixed;
+            right: 20px;
+            top: 40px;
+            background: white;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }}
+
+        .toc-title {{
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }}
+
+        .toc ul {{
+            list-style: none;
+            padding: 0;
+        }}
+
+        .toc li {{
+            margin: 8px 0;
+        }}
+
+        .toc a {{
+            color: #555;
+            text-decoration: none;
+            font-size: 13px;
+            display: block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }}
+
+        .toc a:hover {{
+            background: #f0f0f0;
+            color: #3498db;
+        }}
+
+        /* 페이지 콘텐츠 */
+        .page-content {{
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+
+        .page-content.active {{
+            display: block;
         }}
 
         .doc-header {{
@@ -344,6 +452,7 @@ def generate_html():
             color: #34495e;
             border-left: 4px solid #3498db;
             padding-left: 15px;
+            scroll-margin-top: 20px;
         }}
 
         h3 {{
@@ -414,12 +523,12 @@ def generate_html():
         }}
 
         /* 리스트 */
-        ul {{
+        .main-content ul {{
             margin: 15px 0;
             padding-left: 30px;
         }}
 
-        li {{
+        .main-content li {{
             margin: 8px 0;
             color: #555;
         }}
@@ -442,6 +551,12 @@ def generate_html():
         }}
 
         /* 반응형 */
+        @media (max-width: 1400px) {{
+            .toc {{
+                display: none;
+            }}
+        }}
+
         @media (max-width: 768px) {{
             .sidebar {{
                 width: 100%;
@@ -449,19 +564,83 @@ def generate_html():
                 height: auto;
             }}
 
-            .main-content {{
+            .main-wrapper {{
                 margin-left: 0;
+            }}
+
+            .main-content {{
                 padding: 20px;
             }}
         }}
     </style>
     <script>
-        function showSection(id) {{
-            const section = document.getElementById(id);
-            if (section) {{
-                section.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+        // 현재 활성 페이지 추적
+        let currentPage = '';
+        let documentData = {documents};
+
+        // 페이지 표시 함수
+        function showPage(pageId) {{
+            // 모든 페이지 숨기기
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // 선택된 페이지 표시
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {{
+                targetPage.classList.add('active');
+                currentPage = pageId;
+
+                // 좌측 네비게이션 활성화 표시
+                const navLinks = document.querySelectorAll('.sidebar a');
+                navLinks.forEach(link => link.classList.remove('active'));
+                const activeNav = document.getElementById('nav-' + pageId);
+                if (activeNav) {{
+                    activeNav.classList.add('active');
+                }}
+
+                // TOC 업데이트
+                updateTOC(pageId);
+
+                // 페이지 상단으로 스크롤
+                window.scrollTo({{ top: 0, behavior: 'smooth' }});
             }}
         }}
+
+        // TOC 업데이트 함수
+        function updateTOC(pageId) {{
+            const toc = document.getElementById('toc-content');
+            if (!toc) return;
+
+            // 현재 페이지의 문서 데이터 찾기
+            const docData = documentData.find(doc => doc.id === pageId);
+
+            if (!docData || !docData.sections || docData.sections.length === 0) {{
+                toc.innerHTML = '<p style="color: #999; font-size: 12px;">이 페이지에는 섹션이 없습니다.</p>';
+                return;
+            }}
+
+            // TOC 생성
+            let tocHtml = '<ul>';
+            docData.sections.forEach(section => {{
+                tocHtml += `<li><a href="#${{section.id}}" onclick="scrollToSection('${{section.id}}'); return false;">${{section.title}}</a></li>`;
+            }});
+            tocHtml += '</ul>';
+            toc.innerHTML = tocHtml;
+        }}
+
+        // 섹션으로 스크롤
+        function scrollToSection(sectionId) {{
+            const element = document.getElementById(sectionId);
+            if (element) {{
+                element.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+            }}
+        }}
+
+        // 페이지 로드 시 첫 페이지 표시
+        document.addEventListener('DOMContentLoaded', function() {{
+            const firstPageId = documentData.length > 0 ? documentData[0].id : 'updates';
+            showPage(firstPageId);
+        }});
     </script>
 </head>
 <body>
@@ -477,13 +656,47 @@ def generate_html():
             </nav>
         </aside>
 
-        <main class="main-content">
-            {content_html}
-        </main>
+        <div class="main-wrapper">
+            <main class="main-content">
+                {pages_html}
+            </main>
+
+            <aside class="toc">
+                <div class="toc-title">📑 이 페이지</div>
+                <div id="toc-content"></div>
+            </aside>
+        </div>
     </div>
 </body>
 </html>
 """
+
+    # JavaScript 데이터 생성
+    import json
+    doc_data = []
+    for doc in documents:
+        doc_data.append({
+            'id': doc['id'],
+            'title': doc['title'],
+            'sections': doc['sections']
+        })
+
+    # updates와 changelog도 추가
+    if updates_content:
+        doc_data.insert(0, {
+            'id': 'updates',
+            'title': '최근 4주 업데이트',
+            'sections': extract_h2_sections(updates_content)
+        })
+    if changelog_content:
+        insert_pos = 1 if updates_content else 0
+        doc_data.insert(insert_pos, {
+            'id': 'changelog',
+            'title': '전체 변경 이력',
+            'sections': extract_h2_sections(changelog_content)
+        })
+
+    html_template = html_template.replace('{documents}', json.dumps(doc_data, ensure_ascii=False))
 
     # HTML 파일 저장
     output_path = base_dir / 'VIRDY_Onboarding.html'
