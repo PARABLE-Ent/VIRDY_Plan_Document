@@ -1,7 +1,7 @@
 # 네트워크 시스템
 
-> **문서 버전**: 1.0
-> **최종 수정일**: 26.01.30 13:20
+> **문서 버전**: 1.1
+> **최종 수정일**: 26.02.03 18:00
 > **작성자**: 임경섭
 
 ---
@@ -273,6 +273,69 @@ Photon Chat을 활용한 텍스트 채팅 및 소셜 기능:
 | 위치/회전 | 네트워크로 동기화 |
 | 제어권 | 한 번에 1명만 스폰포인트 제어 가능 |
 | 요청 방식 | RPC로 StateAuthority에 제어권 요청 |
+
+### 2.16 세션 관리 전환 검토 (서버 개발자 회의 기반)
+
+> 🚧 아래 내용은 서버 개발자 회의(2026.02) 기반 검토 사항이다. 비용 및 기술적 타당성에 따라 변동될 수 있다.
+
+서버 아키텍처 전환 시, 세션 생성/종료가 Backend를 경유하고 Photon Webhook으로 상태를 동기화하는 구조로 변경된다.
+
+#### 전환 후 세션 생성 흐름 (검토 중)
+
+| 단계 | 동작 |
+|------|------|
+| 1 | Client(A)가 Backend에 세션 생성 요청 |
+| 2 | Backend에서 세션 정보 생성 + 8자리 joinCode 발급 |
+| 3 | Client(A)가 Photon Room 생성 |
+| 4 | Photon → Backend Webhook: Room Created → photonRoomId 매핑 저장 |
+| 5 | 다른 Client(B, C)가 joinCode로 참가 |
+| 6 | Photon → Backend Webhook: Player Joined → currentParticipants 증가 |
+
+#### 전환 후 세션 종료 흐름 (검토 중)
+
+| 단계 | 동작 |
+|------|------|
+| 1 | Host가 Backend에 세션 종료 요청 |
+| 2 | Backend → Photon Server API: Close Room 명령 |
+| 3 | Photon → Backend Webhook: Room Closed |
+| 4 | Backend에서 세션 상태 CLOSED 업데이트, closedAt 기록 |
+
+#### Photon Webhook 이벤트 (검토 중)
+
+| 이벤트 | 발생 시점 | Backend 처리 |
+|--------|----------|-------------|
+| PathCreate | Room 생성 시 | photonRoomId 저장, 세션 상태 ACTIVE |
+| PathJoin | 플레이어 입장 시 | currentParticipants 증가, 참가자 기록 |
+| PathLeave | 플레이어 퇴장 시 | currentParticipants 감소 |
+| PathClose | Room 종료 시 | 세션 상태 CLOSED, closedAt 기록 |
+
+#### 세션 데이터 모델 (검토 중)
+
+Backend에서 관리하는 세션 데이터 구조:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | Long | 세션 고유 ID |
+| tenantId | Long | 소속 테넌트 |
+| worldId | Long | 사용 중인 월드 |
+| joinCode | String (8자리) | 참가 코드 (고유) |
+| photonRoomId | String | Photon에서 부여한 Room ID |
+| status | Enum | WAITING / ACTIVE / CLOSED |
+| maxParticipants | Integer | 최대 인원 (플랜에 따라) |
+| currentParticipants | Integer | 현재 인원 |
+| hostUserId | Long | 방장 |
+
+#### Photon Custom Authentication (검토 중)
+
+Photon 접속 시 Backend를 통한 인증을 필수로 설정하여, AppID 탈취로 인한 무단 사용을 방지한다. 클라이언트는 Photon 연결 시 JWT를 전달하고, Photon은 Backend에 인증을 위임한다.
+
+#### 미확정 사항
+
+| 항목 | 상태 | 비고 |
+|------|------|------|
+| 호스트 이탈 시 처리 | 📋 논의 필요 | 호스트 마이그레이션 vs 세션 종료 |
+| 비정상 종료 감지 | 📋 논의 필요 | Heartbeat + Timeout으로 좀비 세션 정리 |
+| joinCode 길이 | 📋 미확정 | 현행 4자리 → 8자리로 변경 검토 |
 
 ---
 

@@ -1,14 +1,16 @@
 # 기술 아키텍처
 
-> **문서 버전**: 1.0
-> **최종 수정일**: 26.01.30 13:20
+> **문서 버전**: 1.1
+> **최종 수정일**: 26.02.03 18:00
 > **작성자**: 임경섭
 
 ---
 
 ## 1. 개요
 
-VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리케이션이다. 서버 로직은 Firebase (Auth, Firestore, Storage, Functions)와 Photon Fusion에 위임하며, 클라이언트는 3개 씬 구조(Sign → Lobby → World)와 Context 서비스 로케이터 패턴을 중심으로 설계된다.
+VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리케이션이다. 클라이언트는 3개 씬 구조(Sign → Lobby → World)와 Context 서비스 로케이터 패턴을 중심으로 설계된다.
+
+서버 아키텍처는 현재 Firebase 기반(Auth, Firestore, Storage, Functions)으로 구현되어 있으며, 서버 개발자 회의(2026.02)를 통해 **Spring Boot 기반 자체 백엔드로의 전환을 검토 중**이다. 전환 방향은 비용, 확장성, 기술적 타당성에 따라 변동될 수 있다.
 
 ---
 
@@ -24,7 +26,8 @@ VIRDY는 Unity 2022.3 LTS 기반의 Windows x64 전용 클라이언트 애플리
 | 렌더 파이프라인 | Universal Render Pipeline (URP) | 14.0.12 |
 | 렌더링 모드 | Forward+ | - |
 | 네트워킹 | Photon Fusion | Shared Mode |
-| 백엔드 | Firebase | Auth, Firestore, Storage, Functions |
+| 백엔드 (현행) | Firebase | Auth, Firestore, Storage, Functions |
+| 백엔드 (전환 검토) | Java Spring Boot 4.0 | GCP Cloud Run, PostgreSQL, Cloudflare R2 |
 | 채팅 | Photon Chat | - |
 
 #### 주요 패키지
@@ -143,7 +146,7 @@ Photon Fusion Shared Mode로 동작하며, 네트워크 오브젝트는 아래 �
 | 변경 감지 | 변경된 데이터만 전송 |
 | 양자화 | [Networked, Accuracy()] 속성으로 데이터 양자화 |
 
-### 2.6 Firebase 통합 구조
+### 2.6 Firebase 통합 구조 (현행)
 
 Firebase 서비스는 4개 하위 모듈로 구성된다.
 
@@ -167,14 +170,65 @@ Firebase 서비스는 4개 하위 모듈로 구성된다.
 | users/{userId}/worlds_private/{worldId} | 비공개 월드 |
 | worlds_public/{worldId} | title, author, authorId, description, sceneName, isPublic, sharedWith, version, visits, urls[] |
 
-### 2.7 빌드 변형
+### 2.7 서버 아키텍처 전환 검토 (서버 개발자 회의 기반)
+
+> 🚧 아래 내용은 서버 개발자 회의(2026.02) 기반 검토 사항이다. 비용 및 기술적 타당성에 따라 변동될 수 있다.
+
+#### 전환 배경
+
+현행 Firebase 아키텍처는 빠른 프로토타이핑에 적합하나, 상용화 단계에서 다음과 같은 한계가 예상된다:
+
+| 한계 | 설명 |
+|------|------|
+| 서버 측 검증 부재 | Firebase는 클라이언트 측 제한에 의존, 라이선스/권한의 서버 검증 불가 |
+| Egress 비용 | Firebase Storage 다운로드 트래픽 비용이 규모 확대 시 부담 |
+| 비즈니스 로직 제약 | Firebase Functions만으로는 복잡한 비즈니스 로직 구현에 한계 |
+| 테넌트/Seat 관리 | 멀티 테넌트 구조를 Firebase로 구현하기 어려움 |
+
+#### 검토 중인 전환 구성
+
+| 영역 | 현행 (Firebase) | 전환 검토안 (Spring Boot) |
+|------|----------------|--------------------------|
+| 백엔드 프레임워크 | Firebase Functions | Java Spring Boot 4.0 |
+| 인프라 | Firebase Hosting | GCP Cloud Run |
+| 인증 | Firebase Auth (이메일/비밀번호) | Steam OAuth → Firebase Auth → Spring Security JWT |
+| 데이터베이스 | Firestore (NoSQL) | PostgreSQL (RDB) |
+| 파일 저장 | Firebase Storage | Cloudflare R2 (Signed URL) |
+| 토큰 관리 | Firebase Auth 토큰 (자동 갱신) | 자체 JWT (Access 1h + Refresh 7~30d) |
+| Photon 연동 | 클라이언트 직접 연결 | Backend Webhook 기반 상태 동기화 |
+
+#### 전환 시 JWT 토큰 구조 (검토 중)
+
+| 토큰 | 만료 | 용도 | 저장 위치 |
+|------|------|------|----------|
+| Access Token | 1시간 | API 호출 인증 | 메모리 (Unity) |
+| Refresh Token | 7~30일 (미확정) | Access Token 갱신 | 로컬 안전한 저장소 |
+
+JWT Payload에는 userId, tenantId, role, subscriptionPlan을 포함하여 API 호출마다 권한 검증이 가능하도록 설계한다.
+
+#### 전환 시 데이터 흐름
+
+인증: Steam 로그인 → Firebase Custom Auth → Backend JWT 발급
+파일 업로드: Backend에서 R2 Signed URL 발급 → 클라이언트가 R2에 직접 업로드 (Egress 비용 0원)
+세션 관리: Photon Webhook → Backend로 Room 이벤트 전달 → 세션 상태 DB 저장
+
+#### 미확정 사항
+
+| 항목 | 상태 | 비고 |
+|------|------|------|
+| Refresh Token 만료 기간 | 📋 미확정 | 7일 vs 30일 |
+| Firebase 유지 범위 | 📋 미확정 | Auth만 유지 vs 완전 탈피 |
+| DB 마이그레이션 전략 | 📋 미확정 | Firestore → PostgreSQL 데이터 이전 |
+| 전환 시점 및 단계 | 📋 미확정 | 점진적 전환 vs 일괄 전환 |
+
+### 2.8 빌드 변형
 
 | 스크립팅 심볼 | 설명 |
 |---------------|------|
 | VIRDY_CORE | 프레임워크 빌드 |
 | VIRDY_DOTWEEN | DOTween 애니메이션 활성화 |
 
-### 2.8 프로젝트 폴더 구조
+### 2.9 프로젝트 폴더 구조
 
 | 폴더 | 역할 |
 |------|------|
@@ -190,7 +244,7 @@ Firebase 서비스는 4개 하위 모듈로 구성된다.
 | Assets/VIRDY-SDK/ | SDK (Editor, Runtime, Samples) |
 | Assets/ExternalPlugins/ | 외부 플러그인 |
 
-### 2.9 배포 플랫폼
+### 2.10 배포 플랫폼
 
 | 플랫폼 | 상태 | 비고 |
 |--------|------|------|
@@ -277,6 +331,7 @@ Photon Fusion Shared Mode는 서버 권한(Server Authority) 없이 클라이언
 
 | 항목 | 설명 | 우선순위 |
 |------|------|----------|
+| **서버 아키텍처 전환** | Firebase → Spring Boot + PostgreSQL + R2 전환 | 높음 |
 | **DI 컨테이너 도입** | Context 서비스 로케이터를 DI 컨테이너로 교체 | 중간 |
 | **ECS 전환** | 대규모 액터 처리를 위한 Entity Component System 검토 | 장기 |
 | **서버 권한 모드** | 경쟁적 기능 추가 시 Host Mode 전환 검토 | 장기 |
@@ -288,6 +343,7 @@ Photon Fusion Shared Mode는 서버 권한(Server Authority) 없이 클라이언
 ## 관련 문서
 
 - [개발 현황](./02_Development_Status.md)
+- [API 명세](./03_API_Specification.md)
 - [네트워크 시스템](../02_Features/05_Network_System.md)
 - [보안 시스템](../03_Operations/03_Security.md)
 - [제품 개요](../01_Product/01_Product_Overview.md)

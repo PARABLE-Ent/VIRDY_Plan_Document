@@ -37,7 +37,8 @@ DOCUMENT_ORDER = [
     "03_Operations/07_Cost_Analysis.md",
     "04_Design/01_UI_Specification.md",
     "05_Technical/01_Architecture.md",
-    "05_Technical/02_Development_Status.md"
+    "05_Technical/02_Development_Status.md",
+    "05_Technical/03_API_Specification.md"
 ]
 
 
@@ -356,19 +357,31 @@ def generate_html():
             flex: 1;
             margin-left: 280px;
             display: flex;
+            justify-content: center;
+        }}
+
+        .content-area {{
+            display: flex;
+            width: 100%;
+            max-width: 1300px;
+            padding: 40px 20px;
+            gap: 30px;
         }}
 
         .main-content {{
             flex: 1;
-            padding: 40px;
-            max-width: 1000px;
+            min-width: 0;
+            max-width: 900px;
         }}
 
         /* 우측 TOC */
+        .toc-wrapper {{
+            width: 240px;
+            flex-shrink: 0;
+        }}
+
         .toc {{
-            width: 250px;
-            position: fixed;
-            right: 20px;
+            position: sticky;
             top: 40px;
             background: white;
             padding: 20px;
@@ -551,9 +564,13 @@ def generate_html():
         }}
 
         /* 반응형 */
-        @media (max-width: 1400px) {{
-            .toc {{
+        @media (max-width: 1200px) {{
+            .toc-wrapper {{
                 display: none;
+            }}
+
+            .content-area {{
+                justify-content: center;
             }}
         }}
 
@@ -568,8 +585,8 @@ def generate_html():
                 margin-left: 0;
             }}
 
-            .main-content {{
-                padding: 20px;
+            .content-area {{
+                padding: 20px 10px;
             }}
         }}
     </style>
@@ -657,14 +674,18 @@ def generate_html():
         </aside>
 
         <div class="main-wrapper">
-            <main class="main-content">
-                {pages_html}
-            </main>
+            <div class="content-area">
+                <main class="main-content">
+                    {pages_html}
+                </main>
 
-            <aside class="toc">
-                <div class="toc-title">📑 이 페이지</div>
-                <div id="toc-content"></div>
-            </aside>
+                <aside class="toc-wrapper">
+                    <div class="toc">
+                        <div class="toc-title">📑 이 페이지</div>
+                        <div id="toc-content"></div>
+                    </div>
+                </aside>
+            </div>
         </div>
     </div>
 </body>

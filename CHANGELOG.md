@@ -7,6 +7,44 @@
 
 ---
 
+## [미배포] - 2026-02-03
+
+### 추가됨
+- **05_Technical/03_API_Specification.md**: API 명세 문서 신규 작성
+  - 현행 Firebase Functions API 정리
+  - 전환 검토 중인 Spring Boot REST API (인증, 아바타, 세션, Webhook)
+  - Signed URL 보안 정책, 에러 응답 형식
+  - 향후 추가 예정 API 영역 정리
+
+### 수정됨 (서버 개발자 회의 내용 반영)
+- **05_Technical/01_Architecture.md**: 서버 아키텍처 전환 검토 섹션 추가 (2.7절)
+  - Spring Boot 4.0 + PostgreSQL + Cloudflare R2 전환 검토안
+  - JWT 토큰 구조, 데이터 흐름 정리
+  - 미확정 사항 (Refresh Token 기간, Firebase 유지 범위 등)
+- **03_Operations/06_Account_System.md**: 인증 흐름 전환 검토 섹션 추가 (2.5절)
+  - Steam OAuth → Firebase Auth → JWT 흐름
+  - Tenant 개념 도입, 계정 복구 흐름
+- **03_Operations/03_Security.md**: 보안 아키텍처 전환 검토 섹션 추가 (2.8절)
+  - JWT 기반 인증 보안, Photon Custom Auth
+  - Photon Webhook Secret 검증, R2 Signed URL 보안
+- **02_Features/01_Avatar_System.md**: 아바타 저장/관리 전환 검토 내용 추가
+  - R2 Signed URL 기반 업로드/다운로드 흐름
+  - fileHash 캐시 검증, Resolve API 검토
+- **02_Features/05_Network_System.md**: 세션 관리 전환 검토 섹션 추가 (2.16절)
+  - Backend 경유 세션 생성/종료 흐름
+  - Photon Webhook 이벤트, 세션 데이터 모델
+  - Photon Custom Authentication
+- **03_Operations/01_User_Roles.md**: 테넌트 내 권한 체계 검토 섹션 추가 (2.6절)
+  - Owner/Admin/Member 관리 권한과 Creator/Manager 프로덕션 역할 분리
+- **03_Operations/02_License_System.md**: Actor/Seat 개념 검토 섹션 추가 (2.5절)
+  - 플랜별 Actor 수 제한 (서버 측 검증)
+  - Seat 기반 멤버 초대 개념
+- **01_Product/02_User_Flow.md**: 로그인/로비 흐름 전환 검토 추가
+  - Steam 주 인증 전환 흐름 (2.2.4절)
+  - 로비 데이터 로딩 전략 (Pre-load/Lazy Load) (2.3.2절)
+
+---
+
 ## [미배포] - 2026-02-02
 
 ### 추가됨

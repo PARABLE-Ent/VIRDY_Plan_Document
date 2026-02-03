@@ -1,14 +1,14 @@
 # 보안 시스템
 
-> **문서 버전**: 1.0
-> **최종 수정일**: 26.01.30 13:20
+> **문서 버전**: 1.1
+> **최종 수정일**: 26.02.03 18:00
 > **작성자**: 임경섭
 
 ---
 
 ## 1. 개요
 
-VIRDY의 보안 시스템은 Firebase 서비스를 기반으로 인증, 데이터 보호, 아바타 저작권 보호를 구현한다. 클라이언트-서버 간 HTTPS 통신, Firestore 보안 규칙, Firebase Functions를 통한 서버 측 검증, VRM 파일 암호화를 주요 보안 계층으로 사용한다.
+VIRDY의 보안 시스템은 인증, 데이터 보호, 아바타 저작권 보호를 중심으로 설계된다. 현행 시스템은 Firebase 서비스(Auth, Firestore 보안 규칙, Functions)를 기반으로 하며, 서버 아키텍처 전환 검토(서버 개발자 회의, 2026.02)에 따라 JWT 기반 인증, Photon Webhook 보안, Signed URL 기반 파일 접근 제어가 추가될 수 있다.
 
 ---
 
@@ -131,6 +131,52 @@ Firestore 보안 규칙을 통해 데이터 접근을 제어한다.
 | 썸네일 | 월드 공개 설정에 따라 공개 |
 | 전송 | HTTPS 암호화 |
 
+### 2.8 보안 아키텍처 전환 검토 (서버 개발자 회의 기반)
+
+> 🚧 아래 내용은 서버 개발자 회의(2026.02) 기반 검토 사항이다. 비용 및 기술적 타당성에 따라 변동될 수 있다.
+
+서버 아키텍처 전환 시 보안 계층이 다음과 같이 강화된다.
+
+#### JWT 기반 인증 보안 (검토 중)
+
+| 항목 | 설명 |
+|------|------|
+| Access Token | 1시간 만료, API 호출마다 서명 검증 |
+| Refresh Token | 7~30일 만료 (미확정), 안전한 로컬 저장소 보관 |
+| JWT Payload | userId, tenantId, role, subscriptionPlan 포함 |
+| 서버 측 검증 | 모든 API 요청에서 JWT 서명/만료/권한 검증 수행 |
+
+현행 Firebase Auth 토큰과 달리, JWT에 구독 플랜과 역할 정보를 직접 포함하여 API 호출마다 서버 측에서 권한을 검증할 수 있다.
+
+#### Photon Custom Authentication (검토 중)
+
+Photon 세션 접속 시 VIRDY Backend를 통한 인증을 필수로 설정하여, AppID 탈취로 인한 무단 사용을 방지한다.
+
+| 단계 | 동작 |
+|------|------|
+| 1 | Unity Client가 Photon에 연결 요청 (JWT 포함) |
+| 2 | Photon이 Backend로 Auth 검증 요청 (JWT 전달) |
+| 3 | Backend에서 JWT 서명/만료/구독 확인 |
+| 4 | 인증 결과를 Photon에 반환 |
+| 5 | Photon이 Client에 연결 허용/거부 |
+
+#### Photon Webhook 보안 (검토 중)
+
+| 항목 | 설명 |
+|------|------|
+| Webhook Secret | Photon → Backend 요청 시 Secret으로 요청 검증 |
+| 이벤트 종류 | Room 생성/종료, Player 입장/퇴장 |
+| Backend 처리 | 세션 상태 DB 저장, 참가자 수 관리 |
+
+#### Cloudflare R2 Signed URL 보안 (검토 중)
+
+| 항목 | 설명 |
+|------|------|
+| 업로드 | Backend에서 시간 제한 Signed URL 발급 → 클라이언트가 R2에 직접 업로드 |
+| 다운로드 | Backend에서 권한 확인 후 Signed URL 발급 → 클라이언트가 R2에서 직접 다운로드 |
+| Egress 비용 | Cloudflare R2는 Egress 무료 (Firebase Storage 대비 비용 절감) |
+| URL 만료 | 시간 제한으로 URL 유출 시에도 재사용 불가 |
+
 ---
 
 ## 3. 설계 시 고려사항
@@ -178,7 +224,9 @@ VRM 파일은 암호화하지만, 메모리에서 복호화된 상태에서 추�
 
 | 항목 | 설명 | 우선순위 |
 |------|------|---------|
-| **서버 측 라이선스 검증** | 클라이언트 측 제한의 서버 검증 | 높음 |
+| **서버 측 라이선스 검증** | JWT 기반 서버 측 구독/권한 검증 | 높음 |
+| **Photon Custom Auth** | Backend를 통한 Photon 접속 인증 | 높음 |
+| **Webhook Secret 검증** | Photon Webhook 요청의 무결성 검증 | 높음 |
 | **소셜 로그인** | Google, Steam 등 OAuth 연동 | 중간 |
 | **2단계 인증** | OTP 또는 인증 앱 연동 | 낮음 |
 | **DRM 강화** | 아바타/월드 파일 DRM 보호 | 장기 |
