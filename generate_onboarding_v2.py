@@ -440,6 +440,126 @@ def generate_html():
             color: #7f8c8d;
         }}
 
+        /* 검색창 스타일 */
+        .search-container {{
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }}
+
+        .search-input-wrapper {{
+            position: relative;
+        }}
+
+        .search-input {{
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }}
+
+        .search-input::placeholder {{
+            color: #95a5a6;
+        }}
+
+        .search-input:focus {{
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5);
+        }}
+
+        .search-icon {{
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+            font-size: 16px;
+        }}
+
+        .search-clear {{
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #95a5a6;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+        }}
+
+        .search-clear:hover {{
+            color: #fff;
+        }}
+
+        /* 검색 결과 스타일 */
+        .search-results {{
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+            display: none;
+        }}
+
+        .search-results.active {{
+            display: block;
+        }}
+
+        .search-result-item {{
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }}
+
+        .search-result-item:hover {{
+            background: rgba(52, 152, 219, 0.2);
+        }}
+
+        .search-result-title {{
+            color: #3498db;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }}
+
+        .search-result-preview {{
+            color: #bdc3c7;
+            font-size: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }}
+
+        .search-result-preview mark {{
+            background: rgba(52, 152, 219, 0.4);
+            color: white;
+            padding: 0 2px;
+            border-radius: 2px;
+        }}
+
+        .search-no-results {{
+            color: #95a5a6;
+            font-size: 13px;
+            padding: 15px;
+            text-align: center;
+        }}
+
+        .search-result-count {{
+            color: #7f8c8d;
+            font-size: 12px;
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 5px;
+        }}
+
         .nav-category {{
             padding: 18px 25px 8px;
             font-weight: 700;
@@ -866,10 +986,207 @@ def generate_html():
             }}
         }}
 
-        // 페이지 로드 시 첫 페이지 표시
+        // 검색 기능
+        let searchTimeout = null;
+
+        function initSearch() {{
+            const searchInput = document.getElementById('search-input');
+            const searchClear = document.getElementById('search-clear');
+            const searchResults = document.getElementById('search-results');
+
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function(e) {{
+                const query = e.target.value.trim();
+
+                // 클리어 버튼 표시/숨김
+                searchClear.style.display = query.length > 0 ? 'block' : 'none';
+
+                // 디바운스 처리
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {{
+                    performSearch(query);
+                }}, 200);
+            }});
+
+            searchClear.addEventListener('click', function() {{
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                searchResults.classList.remove('active');
+                searchResults.innerHTML = '';
+            }});
+
+            // ESC 키로 검색 닫기
+            searchInput.addEventListener('keydown', function(e) {{
+                if (e.key === 'Escape') {{
+                    searchInput.value = '';
+                    searchClear.style.display = 'none';
+                    searchResults.classList.remove('active');
+                    searchResults.innerHTML = '';
+                    searchInput.blur();
+                }}
+            }});
+        }}
+
+        function performSearch(query) {{
+            const searchResults = document.getElementById('search-results');
+
+            if (query.length < 2) {{
+                searchResults.classList.remove('active');
+                searchResults.innerHTML = '';
+                return;
+            }}
+
+            const results = [];
+            const queryLower = query.toLowerCase();
+
+            documentData.forEach(doc => {{
+                const titleMatch = doc.title.toLowerCase().includes(queryLower);
+                const textMatch = doc.searchText && doc.searchText.toLowerCase().includes(queryLower);
+
+                if (titleMatch || textMatch) {{
+                    let preview = '';
+                    let matchIndex = -1;
+
+                    if (doc.searchText) {{
+                        matchIndex = doc.searchText.toLowerCase().indexOf(queryLower);
+                        if (matchIndex !== -1) {{
+                            // 매칭 위치 주변 텍스트 추출
+                            const start = Math.max(0, matchIndex - 40);
+                            const end = Math.min(doc.searchText.length, matchIndex + query.length + 80);
+                            preview = (start > 0 ? '...' : '') +
+                                     doc.searchText.substring(start, end) +
+                                     (end < doc.searchText.length ? '...' : '');
+                        }}
+                    }}
+
+                    results.push({{
+                        id: doc.id,
+                        title: doc.title,
+                        preview: preview,
+                        titleMatch: titleMatch,
+                        query: query
+                    }});
+                }}
+            }});
+
+            displaySearchResults(results, query);
+        }}
+
+        function displaySearchResults(results, query) {{
+            const searchResults = document.getElementById('search-results');
+
+            if (results.length === 0) {{
+                searchResults.innerHTML = '<div class="search-no-results">검색 결과가 없습니다</div>';
+                searchResults.classList.add('active');
+                return;
+            }}
+
+            let html = `<div class="search-result-count">${{results.length}}개 문서에서 발견</div>`;
+
+            results.forEach(result => {{
+                // 검색어 하이라이트
+                let highlightedPreview = result.preview;
+                if (highlightedPreview) {{
+                    const regex = new RegExp(`(${{escapeRegExp(query)}})`, 'gi');
+                    highlightedPreview = highlightedPreview.replace(regex, '<mark>$1</mark>');
+                }}
+
+                html += `
+                    <div class="search-result-item" onclick="goToSearchResult('${{result.id}}', '${{escapeHtml(query)}}')">
+                        <div class="search-result-title">${{result.title}}</div>
+                        ${{highlightedPreview ? `<div class="search-result-preview">${{highlightedPreview}}</div>` : ''}}
+                    </div>
+                `;
+            }});
+
+            searchResults.innerHTML = html;
+            searchResults.classList.add('active');
+        }}
+
+        function goToSearchResult(pageId, query) {{
+            // 검색창 초기화
+            const searchInput = document.getElementById('search-input');
+            const searchClear = document.getElementById('search-clear');
+            const searchResults = document.getElementById('search-results');
+
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchResults.classList.remove('active');
+            searchResults.innerHTML = '';
+
+            // 해당 페이지로 이동
+            showPage(pageId);
+
+            // 페이지 내 검색어 하이라이트 (선택적)
+            if (query) {{
+                setTimeout(() => {{
+                    highlightInPage(query);
+                }}, 100);
+            }}
+        }}
+
+        function highlightInPage(query) {{
+            // 기존 하이라이트 제거
+            const existingHighlights = document.querySelectorAll('.search-highlight');
+            existingHighlights.forEach(el => {{
+                const parent = el.parentNode;
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+                parent.normalize();
+            }});
+
+            if (!query || query.length < 2) return;
+
+            const activePage = document.querySelector('.page-content.active');
+            if (!activePage) return;
+
+            // 텍스트 노드에서 검색어 찾아 하이라이트
+            const walker = document.createTreeWalker(
+                activePage,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const textNodes = [];
+            while (walker.nextNode()) {{
+                if (walker.currentNode.nodeValue.toLowerCase().includes(query.toLowerCase())) {{
+                    textNodes.push(walker.currentNode);
+                }}
+            }}
+
+            textNodes.forEach(node => {{
+                const text = node.nodeValue;
+                const regex = new RegExp(`(${{escapeRegExp(query)}})`, 'gi');
+                if (regex.test(text)) {{
+                    const span = document.createElement('span');
+                    span.innerHTML = text.replace(regex, '<mark class="search-highlight" style="background: #fff3cd; padding: 1px 3px; border-radius: 3px;">$1</mark>');
+                    node.parentNode.replaceChild(span, node);
+                }}
+            }});
+
+            // 첫 번째 하이라이트로 스크롤
+            const firstHighlight = activePage.querySelector('.search-highlight');
+            if (firstHighlight) {{
+                firstHighlight.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+            }}
+        }}
+
+        function escapeRegExp(string) {{
+            return string.replace(/[.*+?^${{}}()|[\\]\\\\]/g, '\\\\$&');
+        }}
+
+        function escapeHtml(text) {{
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }}
+
+        // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {{
             const firstPageId = documentData.length > 0 ? documentData[0].id : 'updates';
             showPage(firstPageId);
+            initSearch();
         }});
     </script>
 </head>
@@ -883,6 +1200,14 @@ def generate_html():
                     생성일: {datetime.now().strftime('%Y-%m-%d %H:%M')}<br>
                     작성: VIRDY Studio
                 </div>
+            </div>
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" class="search-input" placeholder="문서 검색..." autocomplete="off">
+                    <button id="search-clear" class="search-clear">✕</button>
+                </div>
+                <div id="search-results" class="search-results"></div>
             </div>
             <nav>
                 {nav_html}
@@ -908,29 +1233,39 @@ def generate_html():
 </html>
 """
 
-    # JavaScript 데이터 생성
+    # JavaScript 데이터 생성 (검색용 텍스트 포함)
     import json
     doc_data = []
     for doc in documents:
+        # HTML 태그 제거하여 순수 텍스트 추출
+        plain_text = re.sub(r'<[^>]+>', ' ', doc['content'])
+        plain_text = re.sub(r'\s+', ' ', plain_text).strip()
         doc_data.append({
             'id': doc['id'],
             'title': doc['title'],
-            'sections': doc['sections']
+            'sections': doc['sections'],
+            'searchText': plain_text[:10000]  # 검색용 텍스트 (용량 제한)
         })
 
-    # updates와 changelog도 추가
+    # updates와 changelog도 추가 (검색용 텍스트 포함)
     if updates_content:
+        updates_plain = re.sub(r'<[^>]+>', ' ', convert_md_to_html(updates_content, add_ids=False))
+        updates_plain = re.sub(r'\s+', ' ', updates_plain).strip()
         doc_data.insert(0, {
             'id': 'updates',
             'title': '최근 4주 업데이트',
-            'sections': extract_h2_sections(updates_content)
+            'sections': extract_h2_sections(updates_content),
+            'searchText': updates_plain[:10000]
         })
     if changelog_content:
+        changelog_plain = re.sub(r'<[^>]+>', ' ', convert_md_to_html(changelog_content, add_ids=False))
+        changelog_plain = re.sub(r'\s+', ' ', changelog_plain).strip()
         insert_pos = 1 if updates_content else 0
         doc_data.insert(insert_pos, {
             'id': 'changelog',
             'title': '전체 변경 이력',
-            'sections': extract_h2_sections(changelog_content)
+            'sections': extract_h2_sections(changelog_content),
+            'searchText': changelog_plain[:10000]
         })
 
     html_template = html_template.replace('{documents}', json.dumps(doc_data, ensure_ascii=False))
