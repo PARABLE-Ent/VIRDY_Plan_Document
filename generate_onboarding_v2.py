@@ -926,7 +926,7 @@ def generate_html():
     <script>
         // 현재 활성 페이지 추적
         let currentPage = '';
-        let documentData = {documents};
+        let documentData = __DOCUMENT_DATA_PLACEHOLDER__;
 
         // 페이지 표시 함수
         function showPage(pageId) {{
@@ -1268,7 +1268,7 @@ def generate_html():
             'searchText': changelog_plain[:10000]
         })
 
-    html_template = html_template.replace('{documents}', json.dumps(doc_data, ensure_ascii=False))
+    html_template = html_template.replace('__DOCUMENT_DATA_PLACEHOLDER__', json.dumps(doc_data, ensure_ascii=False))
 
     # HTML 파일 저장
     output_path = base_dir / 'VIRDY_Onboarding_v2.html'
