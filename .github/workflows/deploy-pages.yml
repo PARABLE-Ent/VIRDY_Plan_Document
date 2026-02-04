@@ -29,12 +29,12 @@ jobs:
           python-version: '3.12'
 
       - name: Generate HTML
-        run: python generate_onboarding.py
+        run: python generate_onboarding_v2.py
 
       - name: Prepare pages directory
         run: |
           mkdir -p _site
-          cp VIRDY_Onboarding.html _site/index.html
+          cp VIRDY_Onboarding_v2.html _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -20,19 +20,39 @@
 - **03_Operations/02_License_System.md** (v1.1 → v1.2): 플랜 구조 확정 및 제한 정책 구체화
   - 5단계 티어 체계 확정 (Free/Starter/Pro/Studio/Enterprise)
   - 아바타 슬롯 50개, 200MB/개 제한 명시
-  - 월드 용량 800MB 제한 명시
-  - 동시 방 보유 1개 정책 확정 (모든 개인 플랜)
+  - 월드 용량 제한 명시 (Starter 300MB, Pro 이상 800MB)
+  - Actor 수 확정 (Free/Starter 1개, Pro 2개, Studio 4개, Enterprise 6개+)
+  - 동시 방 보유 1개 정책 확정 (Pro/Studio)
   - Free → Starter 전환 유도 전략 섹션 추가 (워터마크/시간제한/기능잠금 옵션)
   - Studio 조직 시트(Organization Sheet) 검토 중 표기
   - 서버 전용 저장 정책 명시 (로컬 저장 제거)
+  - **Actor 개념 정립**: "방 최대 인원" → "세션 최대 Actor"로 용어 변경, 개인 Actor 수와 세션 최대 Actor 구분 명확화
+  - **Manager도 1 Actor로 계산**: 아바타 없이 참여해도 세션 Actor 수에 포함
+  - **Free/Starter 세션 참가 제한**: 멀티플레이어 세션에서 Manager로만 참여 가능
+  - **세션 권한 이전 정책**: Creator/Manager 역할 무관, Pro 이상 플랜이면 세션 유지
+- **03_Operations/01_User_Roles.md** (v1.1 → v1.2): 플랜별 역할 제한 반영
+  - Manager도 1 Actor로 계산됨 명시
+  - 플랜별 역할 제한 테이블 추가 (Free/Starter는 세션에서 Manager로만 참여)
 - **02_Features/01_Avatar_System.md** (v1.1 → v1.2): 저장 정책 구체화
   - 아바타 슬롯 50개, 200MB/개 제한 테이블 추가
+  - Actor 수 라이선스 체계와 동기화 (Studio 4개, Enterprise 6개+)
+  - Actor 개념 설명 추가 (1명이 여러 Actor 운용 가능, 세션은 Actor 수로 제한)
   - 서버 전용 저장 정책 명시 (로컬 저장 제거)
   - 엣지 케이스에 슬롯/용량 초과 대응 추가
 - **02_Features/04_World_System.md** (v1.0 → v1.1): 업로드 제한 구체화
-  - 월드 용량 800MB 제한 테이블 추가
+  - 월드 용량 제한 테이블 추가 (Starter 300MB, Pro 이상 800MB)
   - 서버 전용 저장 정책 명시 (로컬 저장 제거)
   - 업로드 흐름에 용량 검증 단계 추가
+- **02_Features/05_Network_System.md** (v1.1 → v1.2): Actor 기반 세션 제한 개념 반영
+  - 최대 플레이어 100명 → n명 (검토 중)으로 변경
+  - 플레이어 vs Actor 개념 구분 설명 추가
+  - 세션 최대 Actor (호스트 플랜 기준) 개념 명시
+- **01_Product/01_Product_Overview.md** (v1.0 → v1.1): 5티어 플랜 및 Actor 개념 반영
+  - 라이선스 항목에 Starter 플랜 추가
+  - "최대 100명" → "플랜별 세션 최대 Actor 제한"으로 변경
+- **01_Product/02_User_Flow.md** (v1.1 → v1.2): Actor 기반 제한 반영
+  - 월드 참가 시 "인원 확인" → "세션 Actor 수 확인"으로 변경
+  - 엣지 케이스 "100명 초과" → "세션 최대 Actor 초과"로 변경
 
 ### 수정됨 (서버 개발자 회의 1차 내용 반영)
 - **05_Technical/01_Architecture.md**: 서버 아키텍처 전환 검토 섹션 추가 (2.7절)
@@ -54,9 +74,9 @@
   - Photon Custom Authentication
 - **03_Operations/01_User_Roles.md**: 테넌트 내 권한 체계 검토 섹션 추가 (2.6절)
   - Owner/Admin/Member 관리 권한과 Creator/Manager 프로덕션 역할 분리
-- **03_Operations/02_License_System.md**: Actor/Seat 개념 검토 섹션 추가 (2.5절)
-  - 플랜별 Actor 수 제한 (서버 측 검증)
-  - Seat 기반 멤버 초대 개념
+- **03_Operations/02_License_System.md**: Actor/Seat 개념 섹션 추가 (2.5절)
+  - 플랜별 Actor 수 제한 확정 (서버 측 검증)
+  - Seat 기반 멤버 초대 개념 (검토 중)
 - **01_Product/02_User_Flow.md**: 로그인/로비 흐름 전환 검토 추가
   - Steam 주 인증 전환 흐름 (2.2.4절)
   - 로비 데이터 로딩 전략 (Pre-load/Lazy Load) (2.3.2절)
