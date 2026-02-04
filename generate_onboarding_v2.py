@@ -423,27 +423,43 @@ def generate_html():
         }}
 
         .sidebar-header h1 {{
-            font-size: 23px;
+            font-size: 24px;
             font-weight: 800;
             color: #3498db;
             margin-bottom: 5px;
         }}
 
         .sidebar-header .subtitle {{
-            font-size: 14px;
+            font-size: 15px;
             color: #95a5a6;
         }}
 
         .sidebar-header .meta {{
             margin-top: 15px;
-            font-size: 12px;
+            font-size: 13px;
             color: #7f8c8d;
         }}
 
-        /* 검색창 스타일 */
+        /* 우측 상단 검색 영역 */
+        .top-search-bar {{
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 30px;
+            z-index: 99;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }}
+
         .search-container {{
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            width: 350px;
         }}
 
         .search-input-wrapper {{
@@ -452,12 +468,12 @@ def generate_html():
 
         .search-input {{
             width: 100%;
-            padding: 12px 15px 12px 40px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-size: 14px;
+            padding: 12px 40px 12px 45px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            background: #f8f9fa;
+            color: #2c3e50;
+            font-size: 15px;
             outline: none;
             transition: all 0.2s;
         }}
@@ -467,42 +483,56 @@ def generate_html():
         }}
 
         .search-input:focus {{
-            background: rgba(255,255,255,0.15);
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5);
+            background: white;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
         }}
 
         .search-icon {{
             position: absolute;
-            left: 12px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #95a5a6;
-            font-size: 16px;
+            color: #7f8c8d;
+            font-size: 18px;
         }}
 
         .search-clear {{
             position: absolute;
-            right: 10px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
+            background: #e9ecef;
             border: none;
-            color: #95a5a6;
+            color: #7f8c8d;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             display: none;
+            align-items: center;
+            justify-content: center;
         }}
 
         .search-clear:hover {{
-            color: #fff;
+            background: #d1d5db;
+            color: #2c3e50;
         }}
 
-        /* 검색 결과 스타일 */
+        /* 검색 결과 드롭다운 (더 크게) */
         .search-results {{
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 10px;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 500px;
+            max-height: 70vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
             display: none;
+            z-index: 1000;
         }}
 
         .search-results.active {{
@@ -510,60 +540,69 @@ def generate_html():
         }}
 
         .search-result-item {{
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 16px 20px;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 4px;
+            border-bottom: 1px solid #f1f3f4;
+        }}
+
+        .search-result-item:last-child {{
+            border-bottom: none;
         }}
 
         .search-result-item:hover {{
-            background: rgba(52, 152, 219, 0.2);
+            background: #f8f9fa;
         }}
 
         .search-result-title {{
-            color: #3498db;
+            color: #2c3e50;
             font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
+            font-size: 16px;
+            margin-bottom: 6px;
         }}
 
         .search-result-preview {{
-            color: #bdc3c7;
-            font-size: 12px;
-            line-height: 1.4;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }}
 
         .search-result-preview mark {{
-            background: rgba(52, 152, 219, 0.4);
-            color: white;
-            padding: 0 2px;
-            border-radius: 2px;
+            background: #fff3cd;
+            color: #856404;
+            padding: 1px 4px;
+            border-radius: 3px;
         }}
 
         .search-no-results {{
-            color: #95a5a6;
-            font-size: 13px;
-            padding: 15px;
+            color: #7f8c8d;
+            font-size: 15px;
+            padding: 30px 20px;
             text-align: center;
         }}
 
         .search-result-count {{
             color: #7f8c8d;
-            font-size: 12px;
-            padding: 8px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 5px;
+            font-size: 14px;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 500;
+        }}
+
+        .search-results-list {{
+            max-height: calc(70vh - 50px);
+            overflow-y: auto;
         }}
 
         .nav-category {{
             padding: 18px 25px 8px;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 14px;
             color: #ecf0f1;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -584,7 +623,7 @@ def generate_html():
             color: #bdc3c7;
             text-decoration: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 16px;
             transition: all 0.2s ease;
         }}
 
@@ -604,6 +643,7 @@ def generate_html():
         .main-wrapper {{
             flex: 1;
             margin-left: 280px;
+            margin-top: 60px;
             display: flex;
             justify-content: center;
         }}
@@ -635,12 +675,12 @@ def generate_html():
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            max-height: calc(100vh - 60px);
+            max-height: calc(100vh - 120px);
             overflow-y: auto;
         }}
 
         .toc-title {{
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 15px;
@@ -660,7 +700,7 @@ def generate_html():
         .toc a {{
             color: #7f8c8d;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 15px;
             display: block;
             padding: 6px 10px;
             border-radius: 6px;
@@ -695,7 +735,7 @@ def generate_html():
         }}
 
         .section-header h2 {{
-            font-size: 21px;
+            font-size: 22px;
             font-weight: 700;
             margin: 0;
             border: none;
@@ -705,31 +745,31 @@ def generate_html():
 
         /* 제목 스타일 */
         h1 {{
-            font-size: 29px;
+            font-size: 30px;
             font-weight: 800;
             margin: 25px 0 15px;
             color: #1a252f;
         }}
 
         h2 {{
-            font-size: 21px;
+            font-size: 22px;
             font-weight: 700;
             margin: 35px 0 15px;
             color: #2c3e50;
             border-left: 4px solid #3498db;
             padding-left: 15px;
-            scroll-margin-top: 20px;
+            scroll-margin-top: 80px;
         }}
 
         h3 {{
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 600;
             margin: 28px 0 12px;
             color: #34495e;
         }}
 
         h4 {{
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
             margin: 22px 0 10px;
             color: #555;
@@ -738,7 +778,7 @@ def generate_html():
         p {{
             margin: 12px 0;
             color: #555;
-            font-size: 16px;
+            font-size: 17px;
         }}
 
         /* 테이블 */
@@ -746,7 +786,7 @@ def generate_html():
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            font-size: 15px;
+            font-size: 16px;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -776,7 +816,7 @@ def generate_html():
             padding: 3px 8px;
             border-radius: 5px;
             font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
+            font-size: 15px;
             color: #e74c3c;
         }}
 
@@ -787,7 +827,7 @@ def generate_html():
             border-radius: 10px;
             overflow-x: auto;
             margin: 20px 0;
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.5;
         }}
 
@@ -806,7 +846,7 @@ def generate_html():
         li {{
             margin: 10px 0;
             color: #555;
-            font-size: 15px;
+            font-size: 16px;
         }}
 
         /* 중첩 리스트 */
@@ -817,7 +857,7 @@ def generate_html():
 
         ul ul li, ol ul li {{
             margin: 6px 0;
-            font-size: 14px;
+            font-size: 15px;
         }}
 
         /* 구분선 */
@@ -844,7 +884,7 @@ def generate_html():
             padding: 18px 22px;
             margin: 20px 0;
             border-radius: 0 10px 10px 0;
-            font-size: 15px;
+            font-size: 16px;
         }}
 
         blockquote strong {{
@@ -870,6 +910,10 @@ def generate_html():
             .content-area {{
                 justify-content: center;
             }}
+
+            .search-results {{
+                width: 400px;
+            }}
         }}
 
         @media (max-width: 768px) {{
@@ -879,8 +923,23 @@ def generate_html():
                 height: auto;
             }}
 
+            .top-search-bar {{
+                left: 0;
+                padding: 0 15px;
+            }}
+
+            .search-container {{
+                width: 100%;
+            }}
+
+            .search-results {{
+                width: calc(100vw - 30px);
+                right: 0;
+            }}
+
             .main-wrapper {{
                 margin-left: 0;
+                margin-top: 60px;
             }}
 
             .content-area {{
@@ -1075,6 +1134,7 @@ def generate_html():
 
         function displaySearchResults(results, query) {{
             const searchResults = document.getElementById('search-results');
+            const resultsList = searchResults.querySelector('.search-results-list');
 
             if (results.length === 0) {{
                 searchResults.innerHTML = '<div class="search-no-results">검색 결과가 없습니다</div>';
@@ -1082,7 +1142,8 @@ def generate_html():
                 return;
             }}
 
-            let html = `<div class="search-result-count">${{results.length}}개 문서에서 발견</div>`;
+            let countHtml = `<div class="search-result-count">${{results.length}}개 문서에서 발견</div>`;
+            let listHtml = '';
 
             results.forEach(result => {{
                 // 검색어 하이라이트
@@ -1092,7 +1153,7 @@ def generate_html():
                     highlightedPreview = highlightedPreview.replace(regex, '<mark>$1</mark>');
                 }}
 
-                html += `
+                listHtml += `
                     <div class="search-result-item" onclick="goToSearchResult('${{result.id}}', '${{escapeHtml(query)}}')">
                         <div class="search-result-title">${{result.title}}</div>
                         ${{highlightedPreview ? `<div class="search-result-preview">${{highlightedPreview}}</div>` : ''}}
@@ -1100,7 +1161,7 @@ def generate_html():
                 `;
             }});
 
-            searchResults.innerHTML = html;
+            searchResults.innerHTML = countHtml + `<div class="search-results-list">${{listHtml}}</div>`;
             searchResults.classList.add('active');
         }}
 
@@ -1201,18 +1262,23 @@ def generate_html():
                     작성: VIRDY Studio
                 </div>
             </div>
+            <nav>
+                {nav_html}
+            </nav>
+        </aside>
+
+        <div class="top-search-bar">
             <div class="search-container">
                 <div class="search-input-wrapper">
                     <span class="search-icon">🔍</span>
                     <input type="text" id="search-input" class="search-input" placeholder="문서 검색..." autocomplete="off">
                     <button id="search-clear" class="search-clear">✕</button>
                 </div>
-                <div id="search-results" class="search-results"></div>
+                <div id="search-results" class="search-results">
+                    <div class="search-results-list"></div>
+                </div>
             </div>
-            <nav>
-                {nav_html}
-            </nav>
-        </aside>
+        </div>
 
         <div class="main-wrapper">
             <div class="content-area">
